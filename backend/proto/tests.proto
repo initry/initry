@@ -1,0 +1,19 @@
+syntax = "proto3";
+
+import "responses.proto";
+
+message Test {
+  string nodeid = 1;
+  string location = 2;
+  string uuid = 3;
+  string test_run_uuid = 4;
+  string description = 5;
+}
+
+message CreateTestsRequest {
+  repeated Test tests = 1;
+}
+
+service TestsService {
+  rpc CreateTests(CreateTestsRequest) returns (StatusOk);
+}

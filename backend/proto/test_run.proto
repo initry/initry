@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "responses.proto";
+
+
+message CreateTestRunRequest {
+  string uuid = 1;
+  google.protobuf.Timestamp started_at = 2;
+  int32 tests_count = 3;
+  string plugin_type = 4;
+}
+
+
+message StopTestRunRequest {
+  string uuid = 1;
+  google.protobuf.Timestamp stopped_at = 2;
+}
+
+service TestRunService {
+  rpc CreateTestRun(CreateTestRunRequest) returns (StatusOk);
+  rpc StopTestRun(StopTestRunRequest) returns (StatusOk);
+}

@@ -1,0 +1,64 @@
+.loader_ok {
+  width: 8px;
+  height: 8px;
+  display: block;
+  position: relative;
+}
+.loader_ok::after,
+.loader_ok::before {
+  display: inline-block;
+  content: "";
+  box-sizing: border-box;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #0059ff;
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  animation: animloader 2s linear infinite;
+}
+.loader_ok::after {
+  animation-delay: -1s;
+}
+
+.loader_with_fail {
+  width: 8px;
+  height: 8px;
+  display: block;
+  position: relative;
+}
+
+.loader_with_fail::after,
+.loader_with_fail::before {
+  display: inline-block;
+  content: "";
+  box-sizing: border-box;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff0000;
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  padding: 0;
+  animation: animloader 2s linear infinite;
+}
+
+.loader_with_fail::after {
+  animation-delay: 1s;
+}
+
+@keyframes animloader {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}

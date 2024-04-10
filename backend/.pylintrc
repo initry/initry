@@ -1,0 +1,18 @@
+[MAIN]
+ignore=.venv,__pycache__
+ignore-patterns=.*pb2\.py,.*pb2\.pyi,.*pb2_grpc\.py
+disable=
+    C0114,
+    C0115,
+    C0116,
+    R0903
+
+[FORMAT]
+max-line-length = 120
+
+[SIMILARITIES]
+ignore-imports=yes
+min-similarity-lines=7
+ignore-comments=yes
+ignore-docstrings=yes
+

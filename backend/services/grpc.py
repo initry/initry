@@ -1,0 +1,137 @@
+from google.protobuf.json_format import MessageToDict
+from starlette.background import BackgroundTask
+
+from database.mongo import MongoDB
+from protobufs import test_pb2_grpc, test_run_pb2_grpc, tests_pb2_grpc
+from services.test_runs import TestRunsService
+from storage import st
+from tasks.test_run_finalization import update_tests_by_id
+from ws.ws import wsm
+
+
+class TestRunServiceHandler(test_run_pb2_grpc.TestRunServiceServicer):
+    def CreateTestRun(self, request, context):
+        test_run = MessageToDict(request)
+        st.create_test_run(test_run)
+        return tests_pb2_grpc.responses__pb2.StatusOk(status="ok")
+
+    def StopTestRun(self, request, context):
+        incoming_test_run = MessageToDict(request)
+
+        # Save test_run data and test statuses count in storage
+        test_statuses = st.save_test_run_and_test_data(
+            incoming_test_run["uuid"], incoming_test_run["stoppedAt"]
+        )
+        wsm.add(
+            message={"type": "test_run", **incoming_test_run, **test_statuses},
+            channel="live",
+        )
+        BackgroundTask(
+            MongoDB().modify_object(
+                {"uuid": incoming_test_run["uuid"]},
+                {**test_statuses, "stoppedAt": incoming_test_run["stoppedAt"]},
+                "test_runs",
+            )
+        )
+        tests_to_save_in_db = st.get_tests_linked_to_test_run(incoming_test_run["uuid"])
+        update_tests_by_id.delay(tests_to_save_in_db, "tests")
+        wsm.add(
+            message={"type": "test_run", **incoming_test_run, **test_statuses},
+            channel=f"test-run/{incoming_test_run['uuid']}",
+        )
+        BackgroundTask(st.remove_tests(incoming_test_run["uuid"]))
+        BackgroundTask(st.remove_test_run(incoming_test_run["uuid"]))
+        return tests_pb2_grpc.responses__pb2.StatusOk(status="ok")
+
+
+class TestsServiceHandler(tests_pb2_grpc.TestsServiceServicer):
+    def CreateTests(self, request, context):
+        tests = MessageToDict(request)
+        st.create_tests(tests["tests"])
+        test_run = st.get_test_run(tests["tests"][0]["testRunUuid"])
+        this_run_num = TestRunsService().generate_run_id()
+        test_run["runName"] = this_run_num
+        MongoDB().insert_object(test_run, "test_runs")
+        MongoDB().save_objects(tests["tests"], "tests")
+        del test_run["_id"]
+        wsm.add(message={"type": "test_run", **test_run}, channel="live")
+        return tests_pb2_grpc.responses__pb2.StatusOk(status="ok")
+
+
+# Start test / Stop test function
+def send_message(test, test_run_uuid):
+    message = {
+        "type": "test",
+        "uuid": test["uuid"],
+        "status": test["status"],
+        "testRunUuid": test_run_uuid,
+    }
+    wsm.add(message=message, channel="live")
+    wsm.add(message=message, channel=f"test-run/{test_run_uuid}")
+
+
+# Start test / Stop test function
+def modify_test_run(test, test_run_uuid, test_run):
+    if test["status"] == "PASSED":
+        st.modify_test_run(
+            test_run_uuid=test_run_uuid,
+            modified_data={
+                "passed": test_run["passed"] + 1 if "passed" in test_run else 1
+            },
+        )
+    if test["status"] == "FAILED":
+        st.modify_test_run(
+            test_run_uuid=test_run_uuid,
+            modified_data={
+                "failed": test_run["failed"] + 1 if "failed" in test_run else 1
+            },
+        )
+    if test["status"] == "SKIPPED":
+        st.modify_test_run(
+            test_run_uuid=test_run_uuid,
+            modified_data={
+                "skipped": test_run["skipped"] + 1 if "skipped" in test_run else 1
+            },
+        )
+
+
+class TestServiceHandler(test_pb2_grpc.TestServiceServicer):
+    def StartTest(self, request, context):
+        test = MessageToDict(request)
+        st.modify_test(modified_test=test)
+        test_obj = st.get_test(test["uuid"])
+        test_run_uuid = test_obj["testRunUuid"]
+        wsm.add(
+            message={
+                "type": "test",
+                "uuid": test["uuid"],
+                "status": test["status"],
+                "location": test_obj["location"],
+                "testRunUuid": test_run_uuid,
+            },
+            channel=f"test-run/{test_run_uuid}",
+        )
+        return tests_pb2_grpc.responses__pb2.StatusOk(status="ok")
+
+    def StopTest(self, request, context):
+        test = MessageToDict(request)
+        st.modify_test(modified_test=test)
+        test_obj = st.get_test(test["uuid"])
+        test_run_uuid = test_obj["testRunUuid"]
+        test_run = st.get_test_run(test_run_uuid)
+        modify_test_run(test, test_run_uuid, test_run)
+        send_message(test, test_run_uuid)
+        return tests_pb2_grpc.responses__pb2.StatusOk(status="ok")
+
+
+class ClientStreamTestServiceHandler(test_pb2_grpc.ClientStreamTestServiceServicer):
+    def ModifyTest(self, request_iterator, context):
+        for request in request_iterator:
+            test = MessageToDict(request)
+            st.modify_test(modified_test=test)
+            test_obj = st.get_test(test["uuid"])
+            test_run_uuid = test_obj["testRunUuid"]
+            test_run = st.get_test_run(test_run_uuid)
+            modify_test_run(test, test_run_uuid, test_run)
+            send_message(test, test_run_uuid)
+        return tests_pb2_grpc.responses__pb2.StatusOk(status="ok")

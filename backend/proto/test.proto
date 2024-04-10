@@ -1,0 +1,43 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "responses.proto";
+
+enum TestStatus {
+  UNKNOWN = 0;
+  RUNNING = 1;
+  PASSED = 2;
+  FAILED = 3;
+  SKIPPED = 4;
+  EXPECTED_PASSED = 5;
+  EXPECTED_FAILED = 6;
+  ERROR = 7;
+}
+
+message StartTestRequest {
+  string uuid = 1;
+  google.protobuf.Timestamp started_at = 2;
+  TestStatus status = 3;
+}
+
+message StopTestRequest {
+  string uuid = 1;
+  google.protobuf.Timestamp stopped_at = 2;
+  TestStatus status = 3;
+}
+
+message ModifyTestRequest {
+  string uuid = 1;
+  google.protobuf.Timestamp started_at = 2;
+  google.protobuf.Timestamp stopped_at = 3;
+  TestStatus status = 4;
+}
+
+service TestService{
+  rpc StartTest(StartTestRequest) returns (StatusOk);
+  rpc StopTest(StopTestRequest) returns (StatusOk);
+}
+
+service ClientStreamTestService{
+  rpc ModifyTest(stream ModifyTestRequest) returns (StatusOk);
+}
