@@ -1,0 +1,165 @@
+import React from "react";
+import { useEffect, useState } from "react";
+import {Card, CardContent, Paper, Typography } from "@mui/material";
+import Box from "@mui/material/Box";
+import dayjs from "dayjs";
+import duration from "dayjs/plugin/duration";
+import relativeTime from "dayjs/plugin/relativeTime";
+import LinearProgress, {
+  LinearProgressProps,
+} from "@mui/material/LinearProgress";
+import { TestRun, Startedat, Stoppedat } from "@/client";
+import Link from "next/link";
+import {green, red, yellow } from "@mui/material/colors";
+
+interface TestRunRowProps {
+  testRun: TestRun;
+}
+
+dayjs.extend(relativeTime);
+dayjs.extend(duration);
+
+function LinearProgressWithLabel(
+  props: LinearProgressProps & { value: number, failed: number },
+) {
+  return (
+        <LinearProgress color={props.failed === 0 ? 'primary': 'inherit'} variant="determinate"
+                        sx={{color: props.failed > 0 ? red[500] : '',  height: "3px" }}
+          {...props}
+        />
+  );
+}
+
+export const TestRunRow2 = ({ testRun }: TestRunRowProps) => {
+  const { stoppedAt, startedAt, testsCount, passed, failed, skipped } = testRun;
+  const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    const totalProcessed =
+      ((passed as number) || 0) +
+      ((failed as number) || 0) +
+      ((skipped as number) || 0);
+    const percentageProgress = (totalProcessed / (testsCount as number)) * 100;
+    setProgress(percentageProgress.toFixed(2) as unknown as number); // TODO
+  }, [testRun, passed, failed, skipped, testsCount]);
+
+  const formatDuration = (startedAt: Startedat, stoppedAt: Stoppedat | undefined) => {
+    const durationObj = dayjs.duration(
+      dayjs(stoppedAt as string, { format: "YYYY-MM-DDTHH:mm:ss" }).diff(
+        dayjs(startedAt as string, { format: "YYYY-MM-DDTHH:mm:ss" }),
+      ),
+    );
+
+    let durationString = "";
+
+    if (durationObj.days() !== 0) {
+      durationString += `${durationObj.days()}d `;
+    }
+
+    if (
+      durationObj.hours() !== 0 ||
+      durationObj.minutes() !== 0 ||
+      durationObj.days() !== 0
+    ) {
+      if (durationObj.hours() !== 0) {
+        durationString += `${durationObj.hours()}h `;
+      }
+      if (durationObj.minutes() !== 0 || durationObj.days() !== 0) {
+        durationString += `${durationObj.minutes()}m `;
+      }
+    }
+
+    durationString += `${durationObj.seconds()}s`;
+
+    return durationString;
+  };
+
+  const envName = ""
+
+  return (
+    <>
+      <Link href={`/test-runs/${testRun.uuid}`}>
+          <>
+              <Card variant="outlined">
+
+                  {!stoppedAt && (
+                      <LinearProgressWithLabel value={progress} failed={testRun.failed ? testRun.failed as number : 0}/>
+                  )}
+              <CardContent>
+                  <Box sx={{display: "flex", flexDirection: 'row', justifyContent: 'space-between'}}>
+                      <Box sx={{display: "flex", flexDirection: 'row', gap: '50px'}}>
+                          <Box sx={{display: "flex", flexDirection: 'column', gap: '5px', verticalAlign: 'center'}}>
+                              {envName ? (
+                              <Typography sx={{fontSize: 14}} color="text.secondary" gutterBottom>
+                                  possible name tag
+                              </Typography>) : (
+                                  <Typography sx={{}} color="text.secondary">
+                                      {testsCount !== undefined ? testsCount : "0"} tests
+                                  </Typography>)}
+                              <Typography variant="h5">
+                                  {testRun.runName}
+                              </Typography>
+                          </Box>
+                          <Box sx={{display: "flex", flexDirection: 'column', gap: '5px', verticalAlign: 'center'}}>
+                              {envName ? (
+                              <Typography sx={{}} color="text.secondary">
+                                  {testsCount !== undefined ? testsCount : "0"} tests
+                              </Typography>) : (<Typography>&nbsp;</Typography>)}
+                              <Box sx={{display: 'flex', paddingTop: '5px', flexDirection: 'row', gap: '10px'}}>
+                                  <Box>
+                                      <Paper elevation={0} sx={{
+                                          "width": "100%", height: '25px', textAlign: 'center', paddingLeft: '4px',
+                                          paddingRight: '4px'
+                                      }} variant={"outlined"}>
+                                          <Typography color={green[500]}>PASSED: {testRun.passed ? testRun.passed as number : 0}</Typography>
+                                      </Paper>
+                                  </Box>
+                                  <Box>
+                                      <Paper elevation={0} sx={{
+                                          "width": "100%", height: '25px', textAlign: 'center', paddingLeft: '4px',
+                                          paddingRight: '4px'
+                                      }} variant={"outlined"}>
+                                          <Typography color={red[500]}>FAILED: {testRun.failed ? testRun.failed as number : 0}</Typography>
+                                      </Paper>
+                                  </Box>
+                                  <Box>
+                                      <Paper elevation={0} sx={{
+                                          "width": "100%", height: '25px', textAlign: 'center', paddingLeft: '4px',
+                                          paddingRight: '4px'
+                                      }} variant={"outlined"}>
+                                          <Typography color={yellow[800]}>SKIPPED: {testRun.skipped ? testRun.skipped as number : 0}</Typography>
+                                      </Paper>
+                                  </Box>
+                              </Box>
+                          </Box>
+                          <Box sx={{display: "flex", flexDirection: 'column', gap: '5px', verticalAlign: 'center'}}>
+                              <Box>&nbsp;
+                              </Box>
+                              <Box sx={{display: 'flex', paddingTop: '5px', flexDirection: 'row', gap: '10px'}}>
+                                  <Typography sx={{}} color="text.secondary">
+                                      {stoppedAt
+                                          ? `Ended: ${dayjs(testRun.stoppedAt as string).fromNow()}`
+                                          : `Started ${dayjs(startedAt as string).fromNow()}`}
+                                  </Typography>
+                              </Box>
+                          </Box>
+                          <Box sx={{display: "flex", flexDirection: 'column', gap: '5px', verticalAlign: 'center'}}>
+                              <Box>&nbsp;
+                              </Box>
+                              <Box sx={{display: 'flex', paddingTop: '5px', flexDirection: 'row', gap: '10px'}}>
+                                  <Typography sx={{}} color="text.secondary">
+                                      Duration: {formatDuration(startedAt as string, stoppedAt)}
+                                  </Typography>
+                              </Box>
+                          </Box>
+                      </Box>
+                      <Box sx={{display: "flex", flexDirection: 'row'}}>
+                      </Box>
+                  </Box>
+              </CardContent>
+              </Card>
+          </>
+      </Link>
+    </>
+  );
+};
