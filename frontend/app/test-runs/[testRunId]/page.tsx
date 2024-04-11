@@ -206,7 +206,7 @@ const TestRunPage = ({ params }: { params: { testRunId: string } }) => {
                             paddingBottom: "20px",
                           }}
                         >
-                          <TestRow test={t} />
+                          <TestRow test={t} testRun={testRun} />
                         </Box>
                         {idx < tests.length - 1 && (
                           <Divider flexItem key={`divider-${t.uuid}`} />
