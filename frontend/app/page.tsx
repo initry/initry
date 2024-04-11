@@ -9,7 +9,7 @@ import { TestRun, TestRunsApi, StatsApi, TestRunsTrend, Test } from "@/client";
 import React, { useEffect, useRef, useState } from "react";
 import { TrendBarChart } from "@/components/TrendBarChart";
 import { FailuresChart } from "@/components/FailuresChart";
-import {TestRunRow2} from "@/components/TestRunRow2";
+import { TestRunRow } from "@/components/TestRunRow";
 
 const getLatestTestRuns = () => {
   return new TestRunsApi().getLatestTestRuns();
@@ -153,57 +153,71 @@ const Dashboard = () => {
   }, []);
 
   return (
-      <Box sx={{display: "flex", flexDirection: "column", gap: "50px"}}>
-          <Box sx={{display: 'flex', flexDirection: "row"}}>
-              <Box sx={{display: "flex", flexDirection: "column", width: '70%', gap: '20px'}}>
-                  <Box sx={{display: "flex"}}>
-                      <Typography
-                          sx={{marginTop: "10px", marginBottom: "25px"}}
-                          variant="h6"
-                      >
-                          Test runs:
-                      </Typography>
-                  </Box>
-                  <Box sx={{display: "flex"}}>
-                      <Paper elevation={0} sx={{width: "98%"}}>
-                          {testRuns &&
-                              testRuns.map((testRun, idx) => (
-                                  <>
-                                      <Box sx={{display: 'flex', flexDirection: 'column', paddingBottom: '20px'}}>
-                                          <TestRunRow2 key={idx} testRun={testRun}/>
-                                      </Box>
-                                      {idx < testRuns.length - 1 && (
-                                          <Divider flexItem key={`divider-${testRun.uuid}`}/>
-                                      )}
-                                  </>
-                              ))}
-                      </Paper>
-                  </Box>
-              </Box>
-              <Box sx={{display: 'flex', flexDirection: "column", width: '30%', gap: '20px'}}>
-                  <Box sx={{display: "flex"}}>
-                      <Typography
-                          sx={{marginTop: "10px"}}
-                          variant="h6"
-                      >
-                          Trend (7d):
-                      </Typography>
-                  </Box>
-                  <Box sx={{display: "flex"}}>
-                      <TrendBarChart testRunsDataByDay={testRunsDataByDay}/>
-                  </Box>
-                  <Box sx={{display: "flex"}}>
-                      <Typography
-                          variant="h6"
-                      >
-                          Failures (7d):
-                      </Typography> </Box>
-                  <Box sx={{display: "flex"}}>
-                      <FailuresChart testRunsDataByDay={testRunsDataByDay}/>
-                  </Box>
-              </Box>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: "50px" }}>
+      <Box sx={{ display: "flex", flexDirection: "row" }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            width: "70%",
+            gap: "20px",
+          }}
+        >
+          <Box sx={{ display: "flex" }}>
+            <Typography
+              sx={{ marginTop: "10px", marginBottom: "25px" }}
+              variant="h6"
+            >
+              Test runs:
+            </Typography>
           </Box>
+          <Box sx={{ display: "flex" }}>
+            <Paper elevation={0} sx={{ width: "98%" }}>
+              {testRuns &&
+                testRuns.map((testRun, idx) => (
+                  <>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        flexDirection: "column",
+                        paddingBottom: "20px",
+                      }}
+                    >
+                      <TestRunRow key={idx} testRun={testRun} />
+                    </Box>
+                    {idx < testRuns.length - 1 && (
+                      <Divider flexItem key={`divider-${testRun.uuid}`} />
+                    )}
+                  </>
+                ))}
+            </Paper>
+          </Box>
+        </Box>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            width: "30%",
+            gap: "20px",
+          }}
+        >
+          <Box sx={{ display: "flex" }}>
+            <Typography sx={{ marginTop: "10px" }} variant="h6">
+              Trend (7d):
+            </Typography>
+          </Box>
+          <Box sx={{ display: "flex" }}>
+            <TrendBarChart testRunsDataByDay={testRunsDataByDay} />
+          </Box>
+          <Box sx={{ display: "flex" }}>
+            <Typography variant="h6">Failures (7d):</Typography>{" "}
+          </Box>
+          <Box sx={{ display: "flex" }}>
+            <FailuresChart testRunsDataByDay={testRunsDataByDay} />
+          </Box>
+        </Box>
       </Box>
+    </Box>
   );
 };
 

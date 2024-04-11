@@ -10,6 +10,7 @@ import { RunningTestInfo } from "@/components/TestRun/RunningTestInfo";
 import { Loading } from "@/components/Loading/Loading";
 import { TestRow } from "@/components/TestRow";
 import { StatusChart } from "@/components/TestRun/StatusChart";
+import { TestRunRow } from "@/components/TestRunRow";
 
 const getTestRunById = (testRunId: string) => {
   return new TestRunsApi().getTestRunById(testRunId);
@@ -194,17 +195,19 @@ const TestRunPage = ({ params }: { params: { testRunId: string } }) => {
                 Tests:
               </Typography>
               <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Paper
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    width: "70vw",
-                  }}
-                >
+                <Paper elevation={0} sx={{ width: "70vw" }}>
                   {tests &&
                     tests.map((t, idx) => (
                       <>
-                        <TestRow test={t} />
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            paddingBottom: "20px",
+                          }}
+                        >
+                          <TestRow test={t} />
+                        </Box>
                         {idx < tests.length - 1 && (
                           <Divider flexItem key={`divider-${t.uuid}`} />
                         )}

@@ -11,6 +11,7 @@ import "@/app/globals.css";
 import { Container, useTheme } from "@mui/system";
 import Link from "next/link";
 import GitHubIcon from "@mui/icons-material/GitHub";
+import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 
 const drawerWidth = 200;
 
@@ -134,12 +135,32 @@ export const ClientLayout = ({ children }: { children: React.ReactNode }) => {
                   <Link href="/">initry</Link>
                 </Typography>
               </Box>
-              <Box>
-                <Typography variant="h6" noWrap component="div">
-                  <Link href="https://github.com/initry/initry" target="_blank">
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  verticalAlign: "center",
+                  gap: "10px",
+                }}
+              >
+                <Box>
+                  <Link
+                    href="https://initry.io"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <LibraryBooksIcon sx={{ opacity: "50%" }} />
+                  </Link>
+                </Box>
+                <Box>
+                  <Link
+                    href="https://github.com/initry/initry"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <GitHubIcon sx={{ opacity: "50%" }} />
                   </Link>
-                </Typography>
+                </Box>
               </Box>
             </Box>
           </Toolbar>
