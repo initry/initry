@@ -1,3 +1,5 @@
+from typing import Union
+
 from fastapi import APIRouter
 
 from schemas.test import Test, TestsList
@@ -8,10 +10,13 @@ tests_service = TestsService()
 
 
 @tests_router.get(
-    "/{test_id}", operation_id="getTestById", response_model=Test, tags=["Tests"]
+    "/{test_id}", operation_id="getTestById", response_model=Union[Test, list], tags=["Tests"]
 )
 def get_test_by_id(test_id):
-    return tests_service.get_test_by_id(test_id)
+    result = tests_service.get_test_by_id(test_id)
+    if not result:
+        return []
+    return result
 
 
 @tests_router.get(
