@@ -1,6 +1,6 @@
 import React from "react";
 import { useEffect, useState } from "react";
-import { Typography } from "@mui/material";
+import { Card, CardContent, Paper, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import dayjs from "dayjs";
 import duration from "dayjs/plugin/duration";
@@ -10,12 +10,8 @@ import LinearProgress, {
 } from "@mui/material/LinearProgress";
 import { TestRun, Startedat, Stoppedat } from "@/client";
 import Link from "next/link";
-import Status from "@/components/TestRunRow/Status";
-import { Loader } from "@/components/TestRunRow/Loader";
-import Tooltip from "@mui/material/Tooltip";
-import Chip from "@mui/material/Chip";
-import HistoryToggleOffIcon from "@mui/icons-material/HistoryToggleOff";
-import { grey } from "@mui/material/colors";
+import { green, red, yellow } from "@mui/material/colors";
+import { RowStatus } from "@/components/RowStatus";
 
 interface TestRunRowProps {
   testRun: TestRun;
@@ -25,23 +21,22 @@ dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
 function LinearProgressWithLabel(
-  props: LinearProgressProps & { value: number },
+  props: LinearProgressProps & { value: number; failed: number },
 ) {
   return (
-    <Box sx={{ display: "flex", alignItems: "center" }}>
-      <Box sx={{ width: "150%", mr: 2 }}>
-        <LinearProgress
-          variant="determinate"
-          {...props}
-          sx={{ height: "10px" }}
-        />
-      </Box>
-      <Box>
-        <Typography variant="body2" color="text.secondary">{`${Math.round(
-          props.value,
-        )}%`}</Typography>
-      </Box>
-    </Box>
+    <LinearProgress
+      color={props.failed === 0 ? "primary" : "inherit"}
+      variant="determinate"
+      sx={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        right: 0,
+        color: props.failed > 0 ? red[500] : "",
+        height: "5px",
+      }}
+      {...props}
+    />
   );
 }
 
@@ -58,7 +53,10 @@ export const TestRunRow = ({ testRun }: TestRunRowProps) => {
     setProgress(percentageProgress.toFixed(2) as unknown as number); // TODO
   }, [testRun, passed, failed, skipped, testsCount]);
 
-  const formatDuration = (startedAt: Startedat, stoppedAt: Stoppedat) => {
+  const formatDuration = (
+    startedAt: Startedat,
+    stoppedAt: Stoppedat | undefined,
+  ) => {
     const durationObj = dayjs.duration(
       dayjs(stoppedAt as string, { format: "YYYY-MM-DDTHH:mm:ss" }).diff(
         dayjs(startedAt as string, { format: "YYYY-MM-DDTHH:mm:ss" }),
@@ -89,114 +87,190 @@ export const TestRunRow = ({ testRun }: TestRunRowProps) => {
     return durationString;
   };
 
-  return (
-    <>
-      <Link href={`/test-runs/${testRun.uuid}`}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            gap: "20px",
-            ml: 2,
-            mb: 2,
-            mt: 2,
-            mr: 2,
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            {startedAt && !stoppedAt && <Loader<TestRun> item={testRun} />}
-            {stoppedAt && <Status<TestRun> item={testRun} />}
-          </Box>
+  const envName = "";
 
-          <Box sx={{ display: "flex", width: "100%", mr: 2 }}>
-            <Box
-              sx={{ display: "flex", flexDirection: "column", width: "100%" }}
-            >
+  return (
+    <Link href={`/test-runs/${testRun.uuid}`}>
+      <Card variant="outlined">
+        <Box sx={{ position: "relative" }}>
+          {!stoppedAt && (
+            <LinearProgressWithLabel
+              value={progress}
+              failed={testRun.failed ? (testRun.failed as number) : 0}
+            />
+          )}
+        </Box>
+
+        <Box sx={{ display: "flex" }}>
+          {stoppedAt && <RowStatus item={testRun} />}
+          <Box sx={{ display: "flex" }}>
+            <CardContent>
               <Box
                 sx={{
                   display: "flex",
-                  alignItems: "center",
-                  flexWrap: "wrap",
                   flexDirection: "row",
-                  gap: "15px",
-                  //justifyContent: 'space-between',
-                  mt: 1,
-                  mb: 1,
+                  justifyContent: "space-between",
                 }}
               >
-                <Tooltip title="Test run generated name">
-                  <Box sx={{ display: "flex", minWidth: "120px" }}>
-                    <Typography
+                <Box
+                  sx={{ display: "flex", flexDirection: "row", gap: "50px" }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "5px",
+                      verticalAlign: "center",
+                    }}
+                  >
+                    {envName ? (
+                      <Typography
+                        sx={{ fontSize: 14 }}
+                        color="text.secondary"
+                        gutterBottom
+                      >
+                        possible name tag
+                      </Typography>
+                    ) : (
+                      <Typography sx={{}} color="text.secondary">
+                        {testsCount !== undefined ? testsCount : "0"} tests
+                      </Typography>
+                    )}
+                    <Typography variant="h5">{testRun.runName}</Typography>
+                  </Box>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "5px",
+                      verticalAlign: "center",
+                    }}
+                  >
+                    {envName ? (
+                      <Typography sx={{}} color="text.secondary">
+                        {testsCount !== undefined ? testsCount : "0"} tests
+                      </Typography>
+                    ) : (
+                      <Typography>&nbsp;</Typography>
+                    )}
+                    <Box
                       sx={{
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
+                        display: "flex",
+                        paddingTop: "5px",
+                        flexDirection: "row",
+                        gap: "10px",
                       }}
                     >
-                      {testRun.runName}
-                    </Typography>
+                      <Box>
+                        <Paper
+                          elevation={0}
+                          sx={{
+                            width: "100%",
+                            height: "25px",
+                            textAlign: "center",
+                            paddingLeft: "4px",
+                            paddingRight: "4px",
+                          }}
+                          variant={"outlined"}
+                        >
+                          <Typography color={green[500]}>
+                            PASSED:{" "}
+                            {testRun.passed ? (testRun.passed as number) : 0}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                      <Box>
+                        <Paper
+                          elevation={0}
+                          sx={{
+                            width: "100%",
+                            height: "25px",
+                            textAlign: "center",
+                            paddingLeft: "4px",
+                            paddingRight: "4px",
+                          }}
+                          variant={"outlined"}
+                        >
+                          <Typography color={red[500]}>
+                            FAILED:{" "}
+                            {testRun.failed ? (testRun.failed as number) : 0}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                      <Box>
+                        <Paper
+                          elevation={0}
+                          sx={{
+                            width: "100%",
+                            height: "25px",
+                            textAlign: "center",
+                            paddingLeft: "4px",
+                            paddingRight: "4px",
+                          }}
+                          variant={"outlined"}
+                        >
+                          <Typography color={yellow[800]}>
+                            SKIPPED:{" "}
+                            {testRun.skipped ? (testRun.skipped as number) : 0}
+                          </Typography>
+                        </Paper>
+                      </Box>
+                    </Box>
                   </Box>
-                </Tooltip>
-
-                <Tooltip title="Total tests in test run">
-                  <Box sx={{ display: "flex", alignItems: "center" }}>
-                    <Chip
-                      label={testsCount !== undefined ? testsCount : "0"}
-                      sx={{ height: "16px" }}
-                      variant="outlined"
-                    />
-                  </Box>
-                </Tooltip>
-                <Tooltip
-                  title={
-                    stoppedAt
-                      ? dayjs(testRun.stoppedAt as string).toString()
-                      : dayjs(testRun.stoppedAt as string).toString()
-                  }
-                  placement="bottom"
-                >
-                  <Box sx={{ display: "flex" }}>
-                    <Typography
-                      variant="caption"
-                      sx={{ flex: "0 0 auto", ml: 2 }}
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "5px",
+                      verticalAlign: "center",
+                    }}
+                  >
+                    <Box>&nbsp;</Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        paddingTop: "5px",
+                        flexDirection: "row",
+                        gap: "10px",
+                      }}
                     >
-                      {stoppedAt
-                        ? `Ended: ${dayjs(testRun.stoppedAt as string).fromNow()}`
-                        : `Started ${dayjs(startedAt as string).fromNow()}`}
-                    </Typography>
+                      <Typography sx={{}} color="text.secondary">
+                        {stoppedAt
+                          ? `Ended: ${dayjs(testRun.stoppedAt as string).fromNow()}`
+                          : `Started ${dayjs(startedAt as string).fromNow()}`}
+                      </Typography>
+                    </Box>
                   </Box>
-                </Tooltip>
-              </Box>
-
-              <Box sx={{ display: "flex", flexDirection: "row" }}>
-                {stoppedAt && (
-                  <Tooltip title="Duration">
-                    <Box sx={{ display: "flex" }}>
-                      <HistoryToggleOffIcon
-                        fontSize="inherit"
-                        sx={{ color: grey[500] }}
-                      />
-                      <Typography
-                        variant="caption"
-                        sx={{ ml: 1, color: grey[500] }}
-                      >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "5px",
+                      verticalAlign: "center",
+                    }}
+                  >
+                    <Box>&nbsp;</Box>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        paddingTop: "5px",
+                        flexDirection: "row",
+                        gap: "10px",
+                      }}
+                    >
+                      <Typography sx={{}} color="text.secondary">
+                        Duration:{" "}
                         {formatDuration(startedAt as string, stoppedAt)}
                       </Typography>
                     </Box>
-                  </Tooltip>
-                )}
-                {!stoppedAt && (
-                  <Tooltip title="Execution progress">
-                    <Box sx={{ width: "150%" }}>
-                      <LinearProgressWithLabel value={progress} />
-                    </Box>
-                  </Tooltip>
-                )}
+                  </Box>
+                </Box>
+                <Box sx={{ display: "flex", flexDirection: "row" }}></Box>
               </Box>
-            </Box>
+            </CardContent>
           </Box>
         </Box>
-      </Link>
-    </>
+      </Card>
+    </Link>
   );
 };

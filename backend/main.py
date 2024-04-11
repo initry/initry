@@ -1,6 +1,5 @@
 import asyncio
 import logging
-import os
 import threading
 from concurrent import futures
 from contextlib import asynccontextmanager

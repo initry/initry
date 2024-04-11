@@ -59,18 +59,6 @@ class TestsServiceHandler(tests_pb2_grpc.TestsServiceServicer):
 
 
 # Start test / Stop test function
-def send_message(test, test_run_uuid):
-    message = {
-        "type": "test",
-        "uuid": test["uuid"],
-        "status": test["status"],
-        "testRunUuid": test_run_uuid,
-    }
-    wsm.add(message=message, channel="live")
-    wsm.add(message=message, channel=f"test-run/{test_run_uuid}")
-
-
-# Start test / Stop test function
 def modify_test_run(test, test_run_uuid, test_run):
     if test["status"] == "PASSED":
         st.modify_test_run(
@@ -120,7 +108,16 @@ class TestServiceHandler(test_pb2_grpc.TestServiceServicer):
         test_run_uuid = test_obj["testRunUuid"]
         test_run = st.get_test_run(test_run_uuid)
         modify_test_run(test, test_run_uuid, test_run)
-        send_message(test, test_run_uuid)
+        message = {
+            "type": "test",
+            "uuid": test["uuid"],
+            "status": test["status"],
+            "testRunUuid": test_run_uuid,
+        }
+        wsm.add(message=message, channel="live")
+        message["startedAt"] = test_obj["startedAt"]
+        message["stoppedAt"] = test["stoppedAt"]
+        wsm.add(message=message, channel=f"test-run/{test_run_uuid}")
         return tests_pb2_grpc.responses__pb2.StatusOk(status="ok")
 
 
@@ -133,5 +130,12 @@ class ClientStreamTestServiceHandler(test_pb2_grpc.ClientStreamTestServiceServic
             test_run_uuid = test_obj["testRunUuid"]
             test_run = st.get_test_run(test_run_uuid)
             modify_test_run(test, test_run_uuid, test_run)
-            send_message(test, test_run_uuid)
+            message = {
+                "type": "test",
+                "uuid": test["uuid"],
+                "status": test["status"],
+                "testRunUuid": test_run_uuid,
+            }
+            wsm.add(message=message, channel="live")
+            wsm.add(message=message, channel=f"test-run/{test_run_uuid}")
         return tests_pb2_grpc.responses__pb2.StatusOk(status="ok")

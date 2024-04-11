@@ -9,28 +9,34 @@ interface TestRunStatusInterface {
   testRun: TestRun;
 }
 
-type ChipColor =  'default' | 'primary' | 'secondary' | 'error' | 'info' | 'success' | 'warning';
-
+type ChipColor =
+  | "default"
+  | "primary"
+  | "secondary"
+  | "error"
+  | "info"
+  | "success"
+  | "warning";
 
 export const TestRunStatus = (props: TestRunStatusInterface) => {
   const { testRun } = props;
 
   const getChipProps = () => {
-        if (!testRun.stoppedAt) {
-            return {label: "Running", color: "info"};
-        } else {
-            switch (true) {
-                case testRun.failed as number > 0:
-                    return { label: "Failed", color: "error" };
-                case testRun.failed === 0:
-                    return { label: "Passed", color: "success" };
-                default:
-                    return { label: "Unknown", color: "default" };
-            }
-        }
+    if (!testRun.stoppedAt) {
+      return { label: "Running", color: "info" };
+    } else {
+      switch (true) {
+        case (testRun.failed as number) > 0:
+          return { label: "Failed", color: "error" };
+        case testRun.failed === 0:
+          return { label: "Passed", color: "success" };
+        default:
+          return { label: "Unknown", color: "default" };
+      }
     }
+  };
 
-    const { label, color } = getChipProps();
+  const { label, color } = getChipProps();
 
   return (
     <Box
@@ -51,12 +57,12 @@ export const TestRunStatus = (props: TestRunStatusInterface) => {
           gap: "10px",
         }}
       >
-          <Chip
-              label={label}
-              sx={{ fontSize: "16px" }}
-              color={color as ChipColor}
-              variant="filled"
-          />
+        <Chip
+          label={label}
+          sx={{ fontSize: "16px" }}
+          color={color as ChipColor}
+          variant="filled"
+        />
       </Box>
       <Box>
         <FrameworkLogo framework={testRun?.pluginType} />

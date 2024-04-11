@@ -2,8 +2,8 @@ import React from "react";
 import { Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Link from "next/link";
-import { Loader } from "@/components/TestRunRow/Loader";
-import Status from "@/components/TestRunRow/Status";
+// import { Loader } from "@/components/TestRunRow/Loader";
+// import Status from "@/components/TestRunRow/Status";
 import { Test } from "@/client";
 import dayjs from "dayjs";
 import Tooltip from "@mui/material/Tooltip";
@@ -36,13 +36,13 @@ export const TestHistoryRow = ({ test }: TestRowProps) => {
             mr: 2,
           }}
         >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            {test.status === "RUNNING" ? (
-              <Loader<Test> item={test} />
-            ) : (
-              <Status<Test> item={test} />
-            )}
-          </Box>
+          {/*<Box sx={{ display: "flex", alignItems: "center" }}>*/}
+          {/*  {test.status === "RUNNING" ? (*/}
+          {/*    <Loader<Test> item={test} />*/}
+          {/*  ) : (*/}
+          {/*    <Status<Test> item={test} />*/}
+          {/*  )}*/}
+          {/*</Box>*/}
 
           <Box sx={{ display: "flex", width: "100%", mr: 2 }}>
             <Box

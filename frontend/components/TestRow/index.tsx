@@ -1,78 +1,106 @@
-import React from "react";
-import { Typography } from "@mui/material";
+"use client";
+import { Card, CardContent, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Link from "next/link";
-import { Loader } from "@/components/TestRunRow/Loader";
-import Status from "@/components/TestRunRow/Status";
-import { Test } from "@/client";
+import {Startedat, Stoppedat, Test, TestRun} from "@/client";
 import dayjs from "dayjs";
-import Tooltip from "@mui/material/Tooltip";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
+import { RowStatus } from "@/components/RowStatus";
+import { TestStatusLabel } from "@/components/TestRow/TestStatus";
 
 interface TestRowProps {
+  testRun: TestRun;
   test: Test;
 }
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
-export const TestRow = ({ test }: TestRowProps) => {
-  return (
-    <>
-      <Link href={`/tests/${test.uuid}`}>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            gap: "20px",
-            ml: 2,
-            mb: 2,
-            mt: 2,
-            mr: 2,
-          }}
-        >
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            {test.status === "RUNNING" ? (
-              <Loader<Test> item={test} />
-            ) : (
-              <Status<Test> item={test} />
-            )}
-          </Box>
+export const TestRow = ({ test, testRun }: TestRowProps) => {
+  const { stoppedAt, startedAt } = test;
 
-          <Box sx={{ display: "flex", width: "100%", mr: 2 }}>
-            <Box
-              sx={{ display: "flex", flexDirection: "column", width: "100%" }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  flexWrap: "wrap",
-                  flexDirection: "row",
-                  gap: "15px",
-                  mt: 1,
-                  mb: 1,
-                }}
-              >
-                <Tooltip title="Test name">
-                  <Box sx={{ display: "flex", minWidth: "120px" }}>
-                    <Typography
-                      sx={{
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                      }}
-                    >
+  const formatDuration = (
+    startedAt: Startedat,
+    stoppedAt: Stoppedat | undefined,
+  ) => {
+    const durationObj = dayjs.duration(
+      dayjs(stoppedAt as string, { format: "YYYY-MM-DDTHH:mm:ss" }).diff(
+        dayjs(startedAt as string, { format: "YYYY-MM-DDTHH:mm:ss" }),
+      ),
+    );
+
+    let durationString = "";
+
+    if (durationObj.days() !== 0) {
+      durationString += `${durationObj.days()}d `;
+    }
+
+    if (
+      durationObj.hours() !== 0 ||
+      durationObj.minutes() !== 0 ||
+      durationObj.days() !== 0
+    ) {
+      if (durationObj.hours() !== 0) {
+        durationString += `${durationObj.hours()}h `;
+      }
+      if (durationObj.minutes() !== 0 || durationObj.days() !== 0) {
+        durationString += `${durationObj.minutes()}m `;
+      }
+    }
+
+    durationString += `${durationObj.seconds()}s`;
+
+    return durationString;
+  };
+
+  return (
+    <Link href={`/tests/${test.uuid}`}>
+      <Card variant="outlined">
+        <Box sx={{ display: "flex" }}>
+          <RowStatus item={test} />
+          <Box sx={{ display: "flex" }}>
+            <CardContent>
+              <Box sx={{ display: "flex", flexDirection: "row" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    gap: "20px",
+                    alignItems: "center",
+                    verticalAlign: "center",
+                  }}
+                >
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <Typography variant="h5">
                       {test.location as string}
                     </Typography>
                   </Box>
-                </Tooltip>
+                  <Box sx={{ display: "flex", flexDirection: "column" }}>
+                    <TestStatusLabel status={test.status} />
+                  </Box>
+                    {testRun.stoppedAt && (
+                        <Box sx={{display: "flex", flexDirection: "column"}}>
+                            <Typography sx={{}} color="text.secondary">
+                                {test.stoppedAt
+                                    ? `Ended: ${dayjs(test.stoppedAt as string).fromNow()}`
+                                    : `Started ${dayjs(startedAt as string).fromNow()}`}
+                            </Typography>
+                        </Box>
+                    )}
+                    {test.startedAt && test.stoppedAt && (
+                        <Box sx={{display: "flex", flexDirection: "column"}}>
+                            <Typography sx={{}} color="text.secondary">
+                                Duration: {formatDuration(startedAt as string, stoppedAt)}
+                            </Typography>
+                        </Box>
+                    )}
+                </Box>
               </Box>
-            </Box>
+            </CardContent>
           </Box>
         </Box>
-      </Link>
-    </>
+      </Card>
+    </Link>
   );
 };
