@@ -51,7 +51,7 @@ This will start Initry with the specified environment settings.
 
 ### Install pytest-initry
 
-To collect test results you need to install the [pytest-initry]() library.
+To collect test results you need to install the [pytest-initry](https://github.com/initry/pytest-initry) library.
 
 
 ### Optional
