@@ -2,11 +2,13 @@
 import React from "react";
 import Box from "@mui/material/Box";
 import Chip from "@mui/material/Chip";
-import { Test } from "@/client";
+import { Test, TestRun } from "@/client";
 import { yellow } from "@mui/material/colors";
+import { FrameworkLogo } from "@/components/TestRun/FrameworkLogo";
 
 interface TestStatusInterface {
   test: Test;
+  testRun: TestRun;
 }
 
 type ChipColor =
@@ -18,7 +20,7 @@ type ChipColor =
   | "success"
   | "warning";
 
-export const TestStatus = ({ test }: TestStatusInterface) => {
+export const TestStatus = ({ test, testRun }: TestStatusInterface) => {
   const getChipProps = () => {
     if (!test.stoppedAt) {
       return { label: "Running", color: "info" };
@@ -68,6 +70,9 @@ export const TestStatus = ({ test }: TestStatusInterface) => {
           variant="filled"
           style={{ backgroundColor }}
         />
+      </Box>
+      <Box>
+        <FrameworkLogo framework={testRun?.pluginType} />
       </Box>
     </Box>
   );

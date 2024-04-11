@@ -1,6 +1,6 @@
 from typing import Any
 
-from pymongo import MongoClient
+from pymongo import ASCENDING, DESCENDING, MongoClient
 from pymongo.database import Database
 from pymongo.errors import PyMongoError
 
@@ -87,19 +87,29 @@ class MongoDB:
             handle_mongodb_exception(e)
             return None
 
-    def find_many(self, filter_criteria, collection_name, limit=0):
+    def find_many(self, filter_criteria, collection_name, limit=0, sort=None):
         """
         Find all objects matching the criteria
         :param filter_criteria: {"key": "value"}
         :param collection_name: str
         :param limit: int
+        :param sort: tuple
         :return:
         """
         try:
             collection = self.db[collection_name]
             if not isinstance(filter_criteria, dict):
                 raise ValueError("MongoDB: Filter criteria must be a dictionary")
-            result = collection.find(filter_criteria, limit=limit)
+            if sort:
+                sort_criteria = [
+                    (field, DESCENDING if order == "DESC" else ASCENDING)
+                    for field, order in sort
+                ]
+                result = collection.find(filter_criteria, limit=limit).sort(
+                    sort_criteria
+                )
+            else:
+                result = collection.find(filter_criteria, limit=limit)
             return list(result)
         except (PyMongoError, ValueError) as e:
             handle_mongodb_exception(e)

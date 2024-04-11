@@ -170,7 +170,6 @@ const TestRunPage = ({ params }: { params: { testRunId: string } }) => {
             <RunningTestInfo runningTests={runningTests} testRun={testRun} />
           )}
           {testRun?.stoppedAt && <TestRunStatus testRun={testRun} />}
-
           <Box
             sx={{
               display: "flex",
@@ -181,7 +180,7 @@ const TestRunPage = ({ params }: { params: { testRunId: string } }) => {
           >
             <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               <Typography sx={{ marginTop: "10px" }} variant="h6">
-                {testRun?.runName}{" "}
+                {testRun?.runName}
               </Typography>
               <Timings testRun={testRun} />
               {/*<Typography sx={{marginTop: "10px"}} variant="h6">Tests count: {testRun?.testsCount}</Typography>*/}
