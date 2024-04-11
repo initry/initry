@@ -37,11 +37,12 @@ class TestsService(AppService):
         merged_list = list(merged_dict.values())
         return merged_list
 
-    def get_history_by_test_id(self, test_id, limit=20):
+    def get_history_by_test_id(self, test_id, limit=20, sort=("stoppedAt", "DESC")):
         test_data = self.get_test_by_id(test_id)
         db_data = self.mongo.find_many(
             {"location": test_data["location"]},
             limit=limit,
+            sort=[sort],
             collection_name=self.collection.name,
         )
         return db_data

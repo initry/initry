@@ -2,7 +2,7 @@
 import { Card, CardContent, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import Link from "next/link";
-import {Startedat, Stoppedat, Test, TestRun} from "@/client";
+import { Startedat, Stoppedat, Test, TestRun } from "@/client";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
@@ -79,22 +79,23 @@ export const TestRow = ({ test, testRun }: TestRowProps) => {
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
                     <TestStatusLabel status={test.status} />
                   </Box>
-                    {testRun.stoppedAt && (
-                        <Box sx={{display: "flex", flexDirection: "column"}}>
-                            <Typography sx={{}} color="text.secondary">
-                                {test.stoppedAt
-                                    ? `Ended: ${dayjs(test.stoppedAt as string).fromNow()}`
-                                    : `Started ${dayjs(startedAt as string).fromNow()}`}
-                            </Typography>
-                        </Box>
-                    )}
-                    {test.startedAt && test.stoppedAt && (
-                        <Box sx={{display: "flex", flexDirection: "column"}}>
-                            <Typography sx={{}} color="text.secondary">
-                                Duration: {formatDuration(startedAt as string, stoppedAt)}
-                            </Typography>
-                        </Box>
-                    )}
+                  {testRun.stoppedAt && (
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                      <Typography sx={{}} color="text.secondary">
+                        {test.stoppedAt
+                          ? `Ended: ${dayjs(test.stoppedAt as string).fromNow()}`
+                          : `Started ${dayjs(startedAt as string).fromNow()}`}
+                      </Typography>
+                    </Box>
+                  )}
+                  {test.startedAt && test.stoppedAt && (
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                      <Typography sx={{}} color="text.secondary">
+                        Duration:{" "}
+                        {formatDuration(startedAt as string, stoppedAt)}
+                      </Typography>
+                    </Box>
+                  )}
                 </Box>
               </Box>
             </CardContent>

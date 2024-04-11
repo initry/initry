@@ -10,6 +10,11 @@ import { TestStatus } from "@/components/Test/Status";
 import Link from "next/link";
 import { FrameworkLogo } from "@/components/TestRun/FrameworkLogo";
 import { TestHistoryRow } from "@/components/TestHistoryRow";
+import { RunningTestInfo } from "@/components/TestRun/RunningTestInfo";
+import { TestRunStatus } from "@/components/TestRun/Status";
+import { Timings } from "@/components/TestRun/Timings";
+import { StatusChart } from "@/components/TestRun/StatusChart";
+import { TestRow } from "@/components/TestRow";
 
 const getTestById = (testRunId: string) => {
   return new TestsApi().getTestById(testRunId);
@@ -78,26 +83,7 @@ const TestPage = ({ params }: { params: { testId: string } }) => {
         <Loading />
       ) : (
         <>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: "20px" }}>
-              <Box sx={{ display: "flex" }}>
-                <TestStatus test={test} />
-              </Box>
-              <Box sx={{ display: "flex" }}>
-                <Typography variant="h6">{test.location as string} </Typography>
-              </Box>
-            </Box>
-            <Box>
-              <FrameworkLogo framework={testRun?.pluginType} />
-            </Box>
-          </Box>
-
+          <TestStatus test={test} testRun={testRun} />
           <Box
             sx={{
               display: "flex",
@@ -107,30 +93,31 @@ const TestPage = ({ params }: { params: { testId: string } }) => {
             }}
           >
             <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <Typography variant="body1">
-                (
+              <Typography sx={{ marginTop: "10px" }} variant="h6">
                 <Link href={`/test-runs/${testRun?.uuid}`}>
                   {testRun?.runName}
                 </Link>
-                )
               </Typography>
+              <Timings testRun={testRun} />
             </Box>
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               <Typography sx={{ marginTop: "10px" }} variant="h6">
                 History (last 20 executions):
               </Typography>
               <Box sx={{ display: "flex", flexDirection: "column" }}>
-                <Paper
-                  sx={{
-                    display: "flex",
-                    flexDirection: "column",
-                    width: "70vw",
-                  }}
-                >
+                <Paper elevation={0} sx={{ width: "70vw" }}>
                   {testHistory &&
                     testHistory.map((t, idx) => (
                       <>
-                        <TestHistoryRow key={idx} test={t} />
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            paddingBottom: "20px",
+                          }}
+                        >
+                          <TestRow test={t} testRun={testRun} />
+                        </Box>
                         {idx < testHistory.length - 1 && (
                           <Divider flexItem key={`divider-${t.uuid}`} />
                         )}
