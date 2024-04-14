@@ -87,12 +87,31 @@ class MongoDB:
             handle_mongodb_exception(e)
             return None
 
-    def find_many(self, filter_criteria, collection_name, limit=0, sort=None):
+    def find(self, limit=None, collection_name=None):
+        """
+        Get all objects
+        :param collection_name: str
+        :param limit: int
+        :return:
+        """
+        try:
+            collection = self.db[collection_name]
+            if limit is None:
+                result = collection.find()
+            else:
+                result = collection.find().limit(limit)
+            return result
+        except (PyMongoError, ValueError) as e:
+            handle_mongodb_exception(e)
+            return None
+
+    def find_many(self, filter_criteria, collection_name, limit=0, skip=0, sort=None):
         """
         Find all objects matching the criteria
         :param filter_criteria: {"key": "value"}
         :param collection_name: str
         :param limit: int
+        :param skip: int
         :param sort: tuple
         :return:
         """
@@ -100,17 +119,75 @@ class MongoDB:
             collection = self.db[collection_name]
             if not isinstance(filter_criteria, dict):
                 raise ValueError("MongoDB: Filter criteria must be a dictionary")
+
             if sort:
-                sort_criteria = [
-                    (field, DESCENDING if order == "DESC" else ASCENDING)
-                    for field, order in sort
-                ]
-                result = collection.find(filter_criteria, limit=limit).sort(
-                    sort_criteria
-                )
+                sort_criteria = [(field, DESCENDING if order == "DESC" else ASCENDING) for field, order in sort]
             else:
-                result = collection.find(filter_criteria, limit=limit)
-            return list(result)
+                sort_criteria = None
+
+            if sort_criteria:
+                result = collection.find(filter_criteria, limit=limit, skip=skip).sort(sort_criteria)
+            else:
+                result = collection.find(filter_criteria, limit=limit, skip=skip)
+
+            return result
+        except (PyMongoError, ValueError) as e:
+            handle_mongodb_exception(e)
+            return None
+
+    def find_many_and_count(self, filter_criteria, collection_name, limit=0, skip=0, sort=None):
+        """
+        Find all objects matching the criteria
+        :param filter_criteria: {"key": "value"}
+        :param collection_name: str
+        :param limit: int
+        :param skip: int
+        :param sort: tuple
+        :return:
+        """
+        try:
+            collection = self.db[collection_name]
+            if not isinstance(filter_criteria, dict):
+                raise ValueError("MongoDB: Filter criteria must be a dictionary")
+
+            pipeline = [{"$match": filter_criteria}]
+
+            if sort:
+                sort_criteria = {
+                    "$sort": {field: DESCENDING if order == "DESC" else ASCENDING for field, order in sort}}
+                pipeline.append(sort_criteria)
+
+            skip_opt = {"$skip": skip} if skip else None
+            limit_opt = {"$limit": limit} if limit else None
+
+            facet_result = []
+
+            if skip_opt:
+                pipeline.append({"$skip": skip})
+                facet_result.append(skip_opt)
+
+            if limit_opt:
+                pipeline.append({"$limit": limit})
+                facet_result.append(limit_opt)
+
+            pipeline.append({
+                "$facet": {
+                    "result": facet_result,  # Pagination in result
+                    "totalCount": [{"$count": "total"}]  # Count of all documents matching the filter
+                }
+            })
+
+            result = list(collection.aggregate(pipeline))
+
+            if result:
+                count = result[0]["totalCount"][0]["total"] if result[0]["totalCount"] else 0
+                actual_result = result[0]["result"]
+            else:
+                count = 0
+                actual_result = []
+
+            return actual_result, count
+
         except (PyMongoError, ValueError) as e:
             handle_mongodb_exception(e)
             return None

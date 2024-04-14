@@ -13,9 +13,27 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { Data } from './data';
 
-export * from './api/search-api';
-export * from './api/stats-api';
-export * from './api/test-runs-api';
-export * from './api/tests-api';
+/**
+ * 
+ * @export
+ * @interface SearchResponse
+ */
+export interface SearchResponse {
+    /**
+     * 
+     * @type {Data}
+     * @memberof SearchResponse
+     */
+    'data': Data;
+    /**
+     * 
+     * @type {number}
+     * @memberof SearchResponse
+     */
+    'count': number;
+}
 

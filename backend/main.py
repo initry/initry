@@ -14,6 +14,7 @@ from fastapi.openapi.models import Server
 from api.stats import stats_router
 from api.test_runs import test_run_router
 from api.tests import tests_router
+from api.search import search_router
 from database.mongo import MongoDB
 from protobufs import test_pb2_grpc, test_run_pb2_grpc, tests_pb2_grpc
 from services.grpc import ClientStreamTestServiceHandler, \
@@ -81,6 +82,7 @@ app.include_router(test_run_router)
 app.include_router(ws_router)
 app.include_router(tests_router)
 app.include_router(stats_router)
+app.include_router(search_router)
 
 
 origins = [

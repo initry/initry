@@ -12,6 +12,12 @@ import { Container, useTheme } from "@mui/system";
 import Link from "next/link";
 import GitHubIcon from "@mui/icons-material/GitHub";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
+import { IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Tooltip } from "@mui/material";
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import MenuIcon from '@mui/icons-material/Menu';
+import GridViewIcon from '@mui/icons-material/GridView';
+import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 
 const drawerWidth = 200;
 
@@ -96,7 +102,9 @@ export const ClientLayout = ({ children }: { children: React.ReactNode }) => {
     setOpen(false);
   };
 
-  const links = [{ tooltip: "Dashboard", link: "/" }];
+  const links = [
+      { tooltip: "Dashboard", link: "/", title: "Dashboard", icon: <GridViewIcon/> },
+      { tooltip: "Search", link: "/search", title: "Search", icon: <ManageSearchIcon/> }]
 
   return (
     <>
@@ -110,18 +118,18 @@ export const ClientLayout = ({ children }: { children: React.ReactNode }) => {
           sx={{ height: "50px", justifyContent: "center" }}
         >
           <Toolbar>
-            {/*<IconButton*/}
-            {/*    color="inherit"*/}
-            {/*    aria-label="open drawer"*/}
-            {/*    onClick={handleDrawerOpen}*/}
-            {/*    edge="start"*/}
-            {/*    sx={{*/}
-            {/*        marginRight: 5,*/}
-            {/*        ...(open && {display: 'none'}),*/}
-            {/*    }}*/}
-            {/*>*/}
-            {/*    <MenuIcon/>*/}
-            {/*</IconButton>*/}
+            <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="start"
+                sx={{
+                    marginRight: 5,
+                    ...(open && {display: 'none'}),
+                }}
+            >
+                <MenuIcon/>
+            </IconButton>
             <Box
               sx={{
                 display: "flex",
@@ -165,43 +173,45 @@ export const ClientLayout = ({ children }: { children: React.ReactNode }) => {
             </Box>
           </Toolbar>
         </AppBar>
-        {/*<Drawer variant="permanent" open={open}>*/}
-        {/*    <DrawerHeader>*/}
-        {/*        <IconButton onClick={handleDrawerClose}>*/}
-        {/*            {theme.direction === 'rtl' ? <ChevronRightIcon/> : <ChevronLeftIcon/>}*/}
-        {/*        </IconButton>*/}
-        {/*    </DrawerHeader>*/}
+        <Drawer variant="permanent" open={open}>
+            <DrawerHeader>
+                <IconButton onClick={handleDrawerClose}>
+                    {theme.direction === 'rtl' ? <ChevronRightIcon/> : <ChevronLeftIcon/>}
+                </IconButton>
+            </DrawerHeader>
 
-        {/*    <List>*/}
-        {/*        {links.map((item, index) => {*/}
-        {/*            return (*/}
-        {/*                <Link href={item.link}>*/}
-        {/*                <ListItem key={index} disablePadding sx={{display: 'block'}}>*/}
-        {/*                    <ListItemButton*/}
-        {/*                        sx={{*/}
-        {/*                            minHeight: 48,*/}
-        {/*                            justifyContent: open ? 'initial' : 'center',*/}
-        {/*                            px: 2.5,*/}
-        {/*                        }}*/}
-        {/*                    >*/}
-        {/*                        <ListItemIcon*/}
-        {/*                            sx={{*/}
-        {/*                                minWidth: 0,*/}
-        {/*                                mr: open ? 3 : 'auto',*/}
-        {/*                                justifyContent: 'center',*/}
-        {/*                            }}*/}
-        {/*                        >*/}
-        {/*
-                {/*                            {index % 2 === 0 ? <Dashboard/> : ''}*/}
-        {/*                        </ListItemIcon>*/}
-        {/*                        <ListItemText primary={index} sx={{opacity: open ? 1 : 0}}/>*/}
-        {/*                    </ListItemButton>*/}
-        {/*                </ListItem>*/}
-        {/*                </Link>*/}
-        {/*            )})}*/}
-        {/*    </List>*/}
-        {/*</Drawer>*/}
-        {/*<DrawerHeader/>*/}
+            <List>
+                {links.map((item, index) => {
+                    return (
+                        <Link key={index} href={item.link}>
+                            <ListItem key={index} disablePadding sx={{display: 'block'}}>
+                                <Tooltip title={item.tooltip}>
+                                <ListItemButton
+                                    sx={{
+                                        minHeight: 48,
+                                        justifyContent: open ? 'initial' : 'center',
+                                        px: 2.5,
+                                    }}
+                                >
+                                    <ListItemIcon
+                                        sx={{
+                                            minWidth: 0,
+                                            mr: open ? 3 : 'auto',
+                                            justifyContent: 'center',
+                                        }}
+                                    >
+                                        {item.icon}
+                                    </ListItemIcon>
+                                    <ListItemText primary={item.title} sx={{opacity: open ? 1 : 0}}/>
+                                </ListItemButton>
+                                </Tooltip>
+                            </ListItem>
+                        </Link>
+                    )
+                })}
+            </List>
+        </Drawer>
+        <DrawerHeader/>
         <Container sx={{ paddingTop: "60px" }} maxWidth={false}>
           {children}
         </Container>
