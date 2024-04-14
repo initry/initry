@@ -24,6 +24,9 @@ message StopTestRequest {
   string uuid = 1;
   google.protobuf.Timestamp stopped_at = 2;
   TestStatus status = 3;
+  string log = 4;
+  string stdout = 5;
+  string stderr = 6;
 }
 
 message ModifyTestRequest {

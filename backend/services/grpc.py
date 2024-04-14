@@ -6,6 +6,7 @@ from protobufs import test_pb2_grpc, test_run_pb2_grpc, tests_pb2_grpc
 from services.test_runs import TestRunsService
 from storage import st
 from tasks.test_run_finalization import update_tests_by_id
+from tasks.test_logs import write_test_log
 from ws.ws import wsm
 
 
@@ -108,6 +109,7 @@ class TestServiceHandler(test_pb2_grpc.TestServiceServicer):
         test_run_uuid = test_obj["testRunUuid"]
         test_run = st.get_test_run(test_run_uuid)
         modify_test_run(test, test_run_uuid, test_run)
+        write_test_log.delay(test)
         message = {
             "type": "test",
             "uuid": test["uuid"],

@@ -21,10 +21,19 @@ import { Description } from './description';
 import { Location } from './location';
 // May contain unused imports in some cases
 // @ts-ignore
+import { Log } from './log';
+// May contain unused imports in some cases
+// @ts-ignore
 import { Nodeid } from './nodeid';
 // May contain unused imports in some cases
 // @ts-ignore
 import { Startedat } from './startedat';
+// May contain unused imports in some cases
+// @ts-ignore
+import { Stderr } from './stderr';
+// May contain unused imports in some cases
+// @ts-ignore
+import { Stdout } from './stdout';
 // May contain unused imports in some cases
 // @ts-ignore
 import { Stoppedat } from './stoppedat';
@@ -89,5 +98,23 @@ export interface Test {
      * @memberof Test
      */
     'status'?: TestStatus;
+    /**
+     * 
+     * @type {Log}
+     * @memberof Test
+     */
+    'log'?: Log;
+    /**
+     * 
+     * @type {Stdout}
+     * @memberof Test
+     */
+    'stdout'?: Stdout;
+    /**
+     * 
+     * @type {Stderr}
+     * @memberof Test
+     */
+    'stderr'?: Stderr;
 }
 

@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { Divider, Paper, Typography } from "@mui/material";
+import { Divider, IconButton, Paper, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { TestRunsApi } from "@/client/api/test-runs-api";
 import { TestRun, Testrunuuid, TestsApi } from "@/client";
@@ -8,12 +8,8 @@ import { Test } from "@/client";
 import { Loading } from "@/components/Loading/Loading";
 import { TestStatus } from "@/components/Test/Status";
 import Link from "next/link";
-import { FrameworkLogo } from "@/components/TestRun/FrameworkLogo";
-import { TestHistoryRow } from "@/components/TestHistoryRow";
-import { RunningTestInfo } from "@/components/TestRun/RunningTestInfo";
-import { TestRunStatus } from "@/components/TestRun/Status";
+import FileCopyIcon from '@mui/icons-material/FileCopy';
 import { Timings } from "@/components/TestRun/Timings";
-import { StatusChart } from "@/components/TestRun/StatusChart";
 import { TestRow } from "@/components/TestRow";
 
 const getTestById = (testRunId: string) => {
@@ -28,17 +24,63 @@ const getTestHistoryByTestId = (testId: string) => {
   return new TestsApi().getHistoryByTestId(testId);
 };
 
+
+const LogBlock = (log: string, title: string, handleCopy: (value: string) => void) => {
+    return (
+    <Box sx={{display: "flex", flexDirection: "column"}}>
+        <Typography variant="h6">{title}</Typography>
+        <Box
+            sx={{
+                position: 'relative',
+                whiteSpace: 'pre-wrap',
+                wordWrap: 'break-word',
+                my: 2,
+                p: 1,
+                backgroundColor: (theme) =>
+                    theme.palette.mode === 'dark' ? '#101010' : 'grey.100',
+                color: (theme) =>
+                    theme.palette.mode === 'dark' ? 'grey.300' : 'grey.800',
+                border: '1px solid',
+                borderColor: (theme) =>
+                    theme.palette.mode === 'dark' ? 'grey.800' : 'grey.300',
+                borderRadius: 1,
+                fontSize: '0.875rem',
+            }}
+        >
+            {log}
+            <IconButton
+                aria-label="Copy"
+                onClick={() => handleCopy(log)}
+                sx={{
+                    position: 'absolute',
+                    top: 0,
+                    right: 0,
+                    color: 'grey.600',
+                    opacity: '50%'
+                }}
+            >
+                <FileCopyIcon />
+            </IconButton>
+        </Box>
+    </Box>
+    )
+}
+
 const TestPage = ({ params }: { params: { testId: string } }) => {
+  const [_copied, setCopied] = useState(false);
   const [loading, setLoading] = useState(true);
   const [test, setTest] = useState<Test>({
-    description: undefined,
-    location: undefined,
-    nodeid: undefined,
-    startedAt: undefined,
-    status: "",
-    stoppedAt: undefined,
-    testRunUuid: undefined,
-    uuid: "",
+      description: undefined,
+      location: undefined,
+      log: undefined,
+      nodeid: undefined,
+      startedAt: undefined,
+      status: undefined,
+      stderr: undefined,
+      stdout: undefined,
+      stoppedAt: undefined,
+      testRunUuid: undefined,
+      uuid: ""
   });
   const [testRun, setTestRun] = useState<TestRun>({
     failed: undefined,
@@ -52,6 +94,14 @@ const TestPage = ({ params }: { params: { testId: string } }) => {
     uuid: "",
   });
   const [testHistory, setTestHistory] = useState<Test[]>([]);
+
+
+  const handleCopy = (value: string) => {
+      navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500); // Reset copied status after 1.5 seconds
+  };
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -101,6 +151,21 @@ const TestPage = ({ params }: { params: { testId: string } }) => {
               <Timings testRun={testRun} />
             </Box>
             <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+              {test.log || test.stdout || test.stderr ? (
+                  <>
+                    <Box sx={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
+                        {test.log && (
+                            LogBlock(test.log as string, "Log", handleCopy)
+                        )}
+                        {test.stdout && (
+                            LogBlock(test.stdout as string, "stdout", handleCopy)
+                        )}
+                        {test.stderr && (
+                            LogBlock(test.stderr as string, "stderr", handleCopy)
+                        )}
+                    </Box>
+                  </>
+              ) : ""}
               <Typography sx={{ marginTop: "10px" }} variant="h6">
                 History (last 20 executions):
               </Typography>

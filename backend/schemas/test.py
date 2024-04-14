@@ -25,6 +25,9 @@ class Test(BaseModel):
     startedAt: Optional[datetime] = None
     stoppedAt: Optional[datetime] = None
     status: Optional[TestStatus] = None
+    log: Optional[str] = None
+    stdout: Optional[str] = None
+    stderr: Optional[str] = None
 
 
 class TestsList(RootModel):
