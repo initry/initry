@@ -13,9 +13,27 @@
  */
 
 
+// May contain unused imports in some cases
+// @ts-ignore
+import { Status } from './status';
 
-export * from './api/search-api';
-export * from './api/stats-api';
-export * from './api/test-runs-api';
-export * from './api/tests-api';
+/**
+ * 
+ * @export
+ * @interface SearchRequest
+ */
+export interface SearchRequest {
+    /**
+     * 
+     * @type {string}
+     * @memberof SearchRequest
+     */
+    'name': string;
+    /**
+     * 
+     * @type {Status}
+     * @memberof SearchRequest
+     */
+    'status'?: Status;
+}
 

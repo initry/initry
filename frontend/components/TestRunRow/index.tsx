@@ -8,10 +8,11 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import LinearProgress, {
   LinearProgressProps,
 } from "@mui/material/LinearProgress";
-import { TestRun, Startedat, Stoppedat } from "@/client";
+import { TestRun } from "@/client";
 import Link from "next/link";
 import { green, red, yellow } from "@mui/material/colors";
 import { RowStatus } from "@/components/RowStatus";
+import {formatDuration} from "@/tools/format-duration";
 
 interface TestRunRowProps {
   testRun: TestRun;
@@ -52,40 +53,6 @@ export const TestRunRow = ({ testRun }: TestRunRowProps) => {
     const percentageProgress = (totalProcessed / (testsCount as number)) * 100;
     setProgress(percentageProgress.toFixed(2) as unknown as number); // TODO
   }, [testRun, passed, failed, skipped, testsCount]);
-
-  const formatDuration = (
-    startedAt: Startedat,
-    stoppedAt: Stoppedat | undefined,
-  ) => {
-    const durationObj = dayjs.duration(
-      dayjs(stoppedAt as string, { format: "YYYY-MM-DDTHH:mm:ss" }).diff(
-        dayjs(startedAt as string, { format: "YYYY-MM-DDTHH:mm:ss" }),
-      ),
-    );
-
-    let durationString = "";
-
-    if (durationObj.days() !== 0) {
-      durationString += `${durationObj.days()}d `;
-    }
-
-    if (
-      durationObj.hours() !== 0 ||
-      durationObj.minutes() !== 0 ||
-      durationObj.days() !== 0
-    ) {
-      if (durationObj.hours() !== 0) {
-        durationString += `${durationObj.hours()}h `;
-      }
-      if (durationObj.minutes() !== 0 || durationObj.days() !== 0) {
-        durationString += `${durationObj.minutes()}m `;
-      }
-    }
-
-    durationString += `${durationObj.seconds()}s`;
-
-    return durationString;
-  };
 
   const envName = "";
 

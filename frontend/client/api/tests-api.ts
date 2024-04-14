@@ -24,6 +24,8 @@ import { BASE_PATH, COLLECTION_FORMATS, RequestArgs, BaseAPI, RequiredError, ope
 // @ts-ignore
 import { HTTPValidationError } from '../models';
 // @ts-ignore
+import { ResponseGettestbyid } from '../models';
+// @ts-ignore
 import { Test } from '../models';
 /**
  * TestsApi - axios parameter creator
@@ -166,7 +168,7 @@ export const TestsApiFp = function(configuration?: Configuration) {
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        async getTestById(testId: any, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Test>> {
+        async getTestById(testId: any, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<ResponseGettestbyid>> {
             const localVarAxiosArgs = await localVarAxiosParamCreator.getTestById(testId, options);
             const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
             const localVarOperationServerBasePath = operationServerMap['TestsApi.getTestById']?.[localVarOperationServerIndex]?.url;
@@ -212,7 +214,7 @@ export const TestsApiFactory = function (configuration?: Configuration, basePath
          * @param {*} [options] Override http request option.
          * @throws {RequiredError}
          */
-        getTestById(testId: any, options?: any): AxiosPromise<Test> {
+        getTestById(testId: any, options?: any): AxiosPromise<ResponseGettestbyid> {
             return localVarFp.getTestById(testId, options).then((request) => request(axios, basePath));
         },
         /**
@@ -252,7 +254,7 @@ export interface TestsApiInterface {
      * @throws {RequiredError}
      * @memberof TestsApiInterface
      */
-    getTestById(testId: any, options?: RawAxiosRequestConfig): AxiosPromise<Test>;
+    getTestById(testId: any, options?: RawAxiosRequestConfig): AxiosPromise<ResponseGettestbyid>;
 
     /**
      * 

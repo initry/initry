@@ -14,8 +14,11 @@
 
 
 
-export * from './api/search-api';
-export * from './api/stats-api';
-export * from './api/test-runs-api';
-export * from './api/tests-api';
+/**
+ * 
+ * @export
+ * @interface Status
+ */
+export interface Status {
+}
 

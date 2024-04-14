@@ -1,27 +1,39 @@
 # initry
 
 
-initry is a reporting system for automation tests. Currently it supports the Pytest framework.
+initry is a reporting system for automation tests. Currently it supports the Pytest framework.  
+
 
 #### How does Initry work? 
 A pytest plugin collects the execution statuses of test cases and sends them to the Initry backend.
 You can review test runs and tests that are in progress or have been completed.
 
 initry consists of:
+
  - Frontend (Next.js)
  - Backend (FastAPI)
- - Pytest plugin.
+ - Pytest plugin
 
 Communication between the backend and frontend is organized via gRPC.
 
 
 ### Requirements
- - Python 3.11.8
  - MongoDB 7
+ - Docker
+ 
+### Download
+
+
+Clone repo from Github
+    ```
+    git clone git@github.com:initry/initry.git
+    ```
+    
+or get it manually from **[https://github.com/initry/initry](https://github.com/initry/initry)**  
 
 ### Configuration
 
-Before running Initry, make sure to set up your environment:
+Before running initry, make sure to set up your environment:
 
 1. Navigate to the `backend` folder and create your `.env` file by copying the `env.example` file:
     ```
@@ -56,8 +68,8 @@ To collect test results you need to install the [pytest-initry](https://github.c
 
 ### Optional
 
-Change API port:
- - Configure `INITRY_API_EXTERNAL_PORT` in your `.env` file.
+Change API port:  
+Configure `INITRY_API_EXTERNAL_PORT` in your `.env` file.
 
-Change Frontend port:
- - Configure `INITRY_FRONTEND_EXTERNAL_PORT` in your `.env` file.
+Change Frontend port:  
+Configure `INITRY_FRONTEND_EXTERNAL_PORT` in your `.env` file.
