@@ -8,7 +8,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
 import { RowStatus } from "@/components/RowStatus";
 import { TestStatusLabel } from "@/components/TestRow/TestStatus";
-import {formatDuration} from "@/tools/format-duration";
+import { formatDuration } from "@/tools/format-duration";
 
 interface TestRowProps {
   testRun: TestRun;

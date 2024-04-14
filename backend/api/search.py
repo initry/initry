@@ -1,4 +1,3 @@
-
 from fastapi import APIRouter
 
 from schemas.search import SearchRequest, SearchResponse
@@ -18,4 +17,4 @@ def post_search_tests_by_name(search: SearchRequest):
     result, count = search_service.get_tests_by_name(search.name, search.status)
     for item in result:
         del item["_id"]
-    return {"data": result, "count": count }
+    return {"data": result, "count": count}

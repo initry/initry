@@ -7,26 +7,29 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
+
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
 
 
-from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 import responses_pb2 as responses__pb2
+from google.protobuf import \
+    timestamp_pb2 as google_dot_protobuf_dot_timestamp__pb2
 
-
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0etest_run.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x0fresponses.proto\"~\n\x14\x43reateTestRunRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12.\n\nstarted_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x13\n\x0btests_count\x18\x03 \x01(\x05\x12\x13\n\x0bplugin_type\x18\x04 \x01(\t\"R\n\x12StopTestRunRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12.\n\nstopped_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp2r\n\x0eTestRunService\x12\x31\n\rCreateTestRun\x12\x15.CreateTestRunRequest\x1a\t.StatusOk\x12-\n\x0bStopTestRun\x12\x13.StopTestRunRequest\x1a\t.StatusOkb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
+    b'\n\x0etest_run.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x0fresponses.proto"~\n\x14\x43reateTestRunRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12.\n\nstarted_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x13\n\x0btests_count\x18\x03 \x01(\x05\x12\x13\n\x0bplugin_type\x18\x04 \x01(\t"R\n\x12StopTestRunRequest\x12\x0c\n\x04uuid\x18\x01 \x01(\t\x12.\n\nstopped_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp2r\n\x0eTestRunService\x12\x31\n\rCreateTestRun\x12\x15.CreateTestRunRequest\x1a\t.StatusOk\x12-\n\x0bStopTestRun\x12\x13.StopTestRunRequest\x1a\t.StatusOkb\x06proto3'
+)
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'test_run_pb2', _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "test_run_pb2", _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
-  DESCRIPTOR._options = None
-  _globals['_CREATETESTRUNREQUEST']._serialized_start=68
-  _globals['_CREATETESTRUNREQUEST']._serialized_end=194
-  _globals['_STOPTESTRUNREQUEST']._serialized_start=196
-  _globals['_STOPTESTRUNREQUEST']._serialized_end=278
-  _globals['_TESTRUNSERVICE']._serialized_start=280
-  _globals['_TESTRUNSERVICE']._serialized_end=394
+    DESCRIPTOR._options = None
+    _globals["_CREATETESTRUNREQUEST"]._serialized_start = 68
+    _globals["_CREATETESTRUNREQUEST"]._serialized_end = 194
+    _globals["_STOPTESTRUNREQUEST"]._serialized_start = 196
+    _globals["_STOPTESTRUNREQUEST"]._serialized_end = 278
+    _globals["_TESTRUNSERVICE"]._serialized_start = 280
+    _globals["_TESTRUNSERVICE"]._serialized_end = 394
 # @@protoc_insertion_point(module_scope)

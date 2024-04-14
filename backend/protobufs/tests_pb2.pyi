@@ -1,8 +1,13 @@
+from typing import ClassVar as _ClassVar
+from typing import Iterable as _Iterable
+from typing import Mapping as _Mapping
+from typing import Optional as _Optional
+from typing import Union as _Union
+
 import responses_pb2 as _responses_pb2
-from google.protobuf.internal import containers as _containers
 from google.protobuf import descriptor as _descriptor
 from google.protobuf import message as _message
-from typing import ClassVar as _ClassVar, Iterable as _Iterable, Mapping as _Mapping, Optional as _Optional, Union as _Union
+from google.protobuf.internal import containers as _containers
 
 DESCRIPTOR: _descriptor.FileDescriptor
 
@@ -18,10 +23,19 @@ class Test(_message.Message):
     uuid: str
     test_run_uuid: str
     description: str
-    def __init__(self, nodeid: _Optional[str] = ..., location: _Optional[str] = ..., uuid: _Optional[str] = ..., test_run_uuid: _Optional[str] = ..., description: _Optional[str] = ...) -> None: ...
+    def __init__(
+        self,
+        nodeid: _Optional[str] = ...,
+        location: _Optional[str] = ...,
+        uuid: _Optional[str] = ...,
+        test_run_uuid: _Optional[str] = ...,
+        description: _Optional[str] = ...,
+    ) -> None: ...
 
 class CreateTestsRequest(_message.Message):
     __slots__ = ("tests",)
     TESTS_FIELD_NUMBER: _ClassVar[int]
     tests: _containers.RepeatedCompositeFieldContainer[Test]
-    def __init__(self, tests: _Optional[_Iterable[_Union[Test, _Mapping]]] = ...) -> None: ...
+    def __init__(
+        self, tests: _Optional[_Iterable[_Union[Test, _Mapping]]] = ...
+    ) -> None: ...

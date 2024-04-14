@@ -12,7 +12,7 @@ import { TestRun } from "@/client";
 import Link from "next/link";
 import { green, red, yellow } from "@mui/material/colors";
 import { RowStatus } from "@/components/RowStatus";
-import {formatDuration} from "@/tools/format-duration";
+import { formatDuration } from "@/tools/format-duration";
 
 interface TestRunRowProps {
   testRun: TestRun;

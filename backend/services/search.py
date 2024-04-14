@@ -1,8 +1,6 @@
-
 from pymongo.collection import Collection
 
 from services.main import AppService
-
 
 
 class SearchService(AppService):
@@ -17,5 +15,7 @@ class SearchService(AppService):
         if status:
             query["status"] = status
 
-        result = self.mongo.find_many_and_count(filter_criteria=query, collection_name=self.collection.name)
+        result = self.mongo.find_many_and_count(
+            filter_criteria=query, collection_name=self.collection.name
+        )
         return result

@@ -1,4 +1,3 @@
-
 from pymongo import MongoClient
 
 from settings import Settings
@@ -14,5 +13,10 @@ def write_test_log(test):
     collection = db["test_logs"]
 
     collection.insert_one(
-        {"uuid": test["uuid"], "log": test["log"],
-         "stdout": test["stdout"], "stderr": test["stderr"]})
+        {
+            "uuid": test["uuid"],
+            "log": test["log"],
+            "stdout": test["stdout"],
+            "stderr": test["stderr"],
+        }
+    )
