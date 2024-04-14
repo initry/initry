@@ -1,6 +1,9 @@
-from pytest_mock import MockerFixture
-from tests.main import client
 from copy import deepcopy
+
+from pytest_mock import MockerFixture
+
+from tests.main import client
+
 
 class TestApiSearch:
 
@@ -30,8 +33,10 @@ class TestApiSearch:
 
     def test__search_by_name_single(self, mocker: MockerFixture):
         item_1 = deepcopy(self.item_1)
-        mocker.patch("services.search.SearchService.get_tests_by_name",
-                     return_value=([item_1], 1))
+        mocker.patch(
+            "services.search.SearchService.get_tests_by_name",
+            return_value=([item_1], 1),
+        )
         response = client.post("/api/search/", json={"name": "test_0", "status": None})
         assert response.status_code == 200
         assert response.json() == {"data": [item_1], "count": 1}
@@ -39,37 +44,49 @@ class TestApiSearch:
     def test__search_by_name_multiple(self, mocker: MockerFixture):
         item_1 = deepcopy(self.item_1)
         item_2 = deepcopy(self.item_2)
-        mocker.patch("services.search.SearchService.get_tests_by_name",
-                     return_value=([item_1, item_2], 2))
+        mocker.patch(
+            "services.search.SearchService.get_tests_by_name",
+            return_value=([item_1, item_2], 2),
+        )
         response = client.post("/api/search/", json={"name": "test_0", "status": None})
         assert response.status_code == 200
         assert response.json() == {"data": [item_1, item_2], "count": 2}
 
     def test_search_by_name_single_and_status(self, mocker: MockerFixture):
         item_1 = deepcopy(self.item_1)
-        mocker.patch("services.search.SearchService.get_tests_by_name",
-                     return_value=([item_1], 1))
-        response = client.post("/api/search/", json={"name": "test_0", "status": "PASSED"})
+        mocker.patch(
+            "services.search.SearchService.get_tests_by_name",
+            return_value=([item_1], 1),
+        )
+        response = client.post(
+            "/api/search/", json={"name": "test_0", "status": "PASSED"}
+        )
         assert response.status_code == 200
         assert response.json() == {"data": [item_1], "count": 1}
 
     def test_search_by_name_single_empty(self, mocker: MockerFixture):
-        mocker.patch("services.search.SearchService.get_tests_by_name",
-                     return_value=([], 0))
+        mocker.patch(
+            "services.search.SearchService.get_tests_by_name", return_value=([], 0)
+        )
         response = client.post("/api/search/", json={"name": "test_0"})
         assert response.status_code == 200
         assert response.json() == {"data": [], "count": 0}
 
     def test_search_by_name_single_and_status_empty(self, mocker: MockerFixture):
-        mocker.patch("services.search.SearchService.get_tests_by_name",
-                     return_value=([], 0))
-        response = client.post("/api/search/", json={"name": "test_0", "status": "PASSED"})
+        mocker.patch(
+            "services.search.SearchService.get_tests_by_name", return_value=([], 0)
+        )
+        response = client.post(
+            "/api/search/", json={"name": "test_0", "status": "PASSED"}
+        )
         assert response.status_code == 200
         assert response.json() == {"data": [], "count": 0}
 
     def test_search_no_name_field(self, mocker: MockerFixture):
-        mocker.patch("services.search.SearchService.get_tests_by_name",
-                     return_value=([], 0))
-        response = client.post("/api/search/", json={"name1": "test_0", "status": "PASSED"})
+        mocker.patch(
+            "services.search.SearchService.get_tests_by_name", return_value=([], 0)
+        )
+        response = client.post(
+            "/api/search/", json={"name1": "test_0", "status": "PASSED"}
+        )
         assert response.status_code == 422
-

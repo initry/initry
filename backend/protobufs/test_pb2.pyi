@@ -47,18 +47,27 @@ class StartTestRequest(_message.Message):
     ) -> None: ...
 
 class StopTestRequest(_message.Message):
-    __slots__ = ("uuid", "stopped_at", "status")
+    __slots__ = ("uuid", "stopped_at", "status", "log", "stdout", "stderr")
     UUID_FIELD_NUMBER: _ClassVar[int]
     STOPPED_AT_FIELD_NUMBER: _ClassVar[int]
     STATUS_FIELD_NUMBER: _ClassVar[int]
+    LOG_FIELD_NUMBER: _ClassVar[int]
+    STDOUT_FIELD_NUMBER: _ClassVar[int]
+    STDERR_FIELD_NUMBER: _ClassVar[int]
     uuid: str
     stopped_at: _timestamp_pb2.Timestamp
     status: TestStatus
+    log: str
+    stdout: str
+    stderr: str
     def __init__(
         self,
         uuid: _Optional[str] = ...,
         stopped_at: _Optional[_Union[_timestamp_pb2.Timestamp, _Mapping]] = ...,
         status: _Optional[_Union[TestStatus, str]] = ...,
+        log: _Optional[str] = ...,
+        stdout: _Optional[str] = ...,
+        stderr: _Optional[str] = ...,
     ) -> None: ...
 
 class ModifyTestRequest(_message.Message):

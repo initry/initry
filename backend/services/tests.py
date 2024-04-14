@@ -16,6 +16,11 @@ class TestsService(AppService):
             key="uuid", value=test_id, collection_name=self.collection.name
         )
 
+    def get_test_logs_by_id(self, test_id):
+        return self.mongo.find_one_by_key_value(
+            key="uuid", value=test_id, collection_name="test_logs"
+        )
+
     def get_tests_from_test_run(self, test_run_id):
         db_data = self.mongo.find_many(
             {"testRunUuid": test_run_id}, collection_name=self.collection.name

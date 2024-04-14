@@ -44,9 +44,11 @@ class StatsService(AppService):
 
     def get_trend(self, period):
         start_date, end_date = date_range(period)
-        start_date = (datetime.datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%SZ")
-                      .replace(hour=0, minute=0, second=0)
-                      .strftime("%Y-%m-%dT%H:%M:%SZ"))
+        start_date = (
+            datetime.datetime.strptime(start_date, "%Y-%m-%dT%H:%M:%SZ")
+            .replace(hour=0, minute=0, second=0)
+            .strftime("%Y-%m-%dT%H:%M:%SZ")
+        )
         pipeline = [
             {"$match": {"startedAt": {"$gte": start_date, "$lte": end_date}}},
             {

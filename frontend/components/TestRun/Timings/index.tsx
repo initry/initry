@@ -4,7 +4,7 @@ import duration from "dayjs/plugin/duration";
 import { TestRun } from "@/client";
 import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
-import {formatDuration} from "@/tools/format-duration";
+import { formatDuration } from "@/tools/format-duration";
 
 dayjs.extend(duration);
 

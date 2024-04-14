@@ -17,8 +17,11 @@ tests_service = TestsService()
 )
 def get_test_by_id(test_id):
     result = tests_service.get_test_by_id(test_id)
+    logs = tests_service.get_test_logs_by_id(test_id)
     if not result:
         return []
+    if logs:
+        return result | logs
     return result
 
 

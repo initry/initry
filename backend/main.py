@@ -42,6 +42,7 @@ async def lifespan(_app: FastAPI):
     mongo_instance.db["tests"].create_index([("uuid", pymongo.ASCENDING)], unique=True)
     mongo_instance.db["tests"].create_index([("testRunUuid", pymongo.ASCENDING)])
     mongo_instance.db["tests"].create_index([("nodeid", pymongo.ASCENDING)])
+    mongo_instance.db["test_logs"].create_index([("uuid", pymongo.ASCENDING)], unique=True)
     loop = asyncio.get_event_loop()
     loop.create_task(wsm.send_messages())
     yield

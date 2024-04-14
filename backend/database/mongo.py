@@ -121,12 +121,17 @@ class MongoDB:
                 raise ValueError("MongoDB: Filter criteria must be a dictionary")
 
             if sort:
-                sort_criteria = [(field, DESCENDING if order == "DESC" else ASCENDING) for field, order in sort]
+                sort_criteria = [
+                    (field, DESCENDING if order == "DESC" else ASCENDING)
+                    for field, order in sort
+                ]
             else:
                 sort_criteria = None
 
             if sort_criteria:
-                result = collection.find(filter_criteria, limit=limit, skip=skip).sort(sort_criteria)
+                result = collection.find(filter_criteria, limit=limit, skip=skip).sort(
+                    sort_criteria
+                )
             else:
                 result = collection.find(filter_criteria, limit=limit, skip=skip)
 
@@ -135,7 +140,9 @@ class MongoDB:
             handle_mongodb_exception(e)
             return None
 
-    def find_many_and_count(self, filter_criteria, collection_name, limit=0, skip=0, sort=None):
+    def find_many_and_count(
+        self, filter_criteria, collection_name, limit=0, skip=0, sort=None
+    ):
         """
         Find all objects matching the criteria
         :param filter_criteria: {"key": "value"}
@@ -154,7 +161,11 @@ class MongoDB:
 
             if sort:
                 sort_criteria = {
-                    "$sort": {field: DESCENDING if order == "DESC" else ASCENDING for field, order in sort}}
+                    "$sort": {
+                        field: DESCENDING if order == "DESC" else ASCENDING
+                        for field, order in sort
+                    }
+                }
                 pipeline.append(sort_criteria)
 
             skip_opt = {"$skip": skip} if skip else None
@@ -170,17 +181,25 @@ class MongoDB:
                 pipeline.append({"$limit": limit})
                 facet_result.append(limit_opt)
 
-            pipeline.append({
-                "$facet": {
-                    "result": facet_result,  # Pagination in result
-                    "totalCount": [{"$count": "total"}]  # Count of all documents matching the filter
+            pipeline.append(
+                {
+                    "$facet": {
+                        "result": facet_result,  # Pagination in result
+                        "totalCount": [
+                            {"$count": "total"}
+                        ],  # Count of all documents matching the filter
+                    }
                 }
-            })
+            )
 
             result = list(collection.aggregate(pipeline))
 
             if result:
-                count = result[0]["totalCount"][0]["total"] if result[0]["totalCount"] else 0
+                count = (
+                    result[0]["totalCount"][0]["total"]
+                    if result[0]["totalCount"]
+                    else 0
+                )
                 actual_result = result[0]["result"]
             else:
                 count = 0
