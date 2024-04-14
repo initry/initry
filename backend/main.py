@@ -11,10 +11,10 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.openapi.models import Server
 
+from api.search import search_router
 from api.stats import stats_router
 from api.test_runs import test_run_router
 from api.tests import tests_router
-from api.search import search_router
 from database.mongo import MongoDB
 from protobufs import test_pb2_grpc, test_run_pb2_grpc, tests_pb2_grpc
 from services.grpc import ClientStreamTestServiceHandler, \
@@ -42,7 +42,9 @@ async def lifespan(_app: FastAPI):
     mongo_instance.db["tests"].create_index([("uuid", pymongo.ASCENDING)], unique=True)
     mongo_instance.db["tests"].create_index([("testRunUuid", pymongo.ASCENDING)])
     mongo_instance.db["tests"].create_index([("nodeid", pymongo.ASCENDING)])
-    mongo_instance.db["test_logs"].create_index([("uuid", pymongo.ASCENDING)], unique=True)
+    mongo_instance.db["test_logs"].create_index(
+        [("uuid", pymongo.ASCENDING)], unique=True
+    )
     loop = asyncio.get_event_loop()
     loop.create_task(wsm.send_messages())
     yield
