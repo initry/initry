@@ -109,7 +109,15 @@ class TestServiceHandler(test_pb2_grpc.TestServiceServicer):
         test_run_uuid = test_obj["testRunUuid"]
         test_run = st.get_test_run(test_run_uuid)
         modify_test_run(test, test_run_uuid, test_run)
-        write_test_log.delay(test)
+        found_strings = []
+        if "log" in test or "stdout" in test or "stderr" in test:
+            if "log" in test:
+                found_strings.append("log")
+            if "stdout" in test:
+                found_strings.append("stdout")
+            if "stderr" in test:
+                found_strings.append("stderr")
+            write_test_log.delay(test, found_strings)
         message = {
             "type": "test",
             "uuid": test["uuid"],
