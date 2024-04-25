@@ -14,6 +14,7 @@
 
 
 
+export * from './api/default-api';
 export * from './api/search-api';
 export * from './api/stats-api';
 export * from './api/test-runs-api';

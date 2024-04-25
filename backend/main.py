@@ -45,6 +45,8 @@ async def lifespan(_app: FastAPI):
     mongo_instance.db["test_logs"].create_index(
         [("uuid", pymongo.ASCENDING)], unique=True
     )
+    mongo_instance.db["test_runs_raw"].create_index([("uuid", pymongo.ASCENDING)])
+
     loop = asyncio.get_event_loop()
     loop.create_task(wsm.send_messages())
     yield
@@ -57,7 +59,7 @@ server = Server(url=f"http://localhost:{settings.get('INITRY_API_EXTERNAL_PORT')
 app = FastAPI(
     lifespan=lifespan,
     title="Initry backend",
-    version="0.1.0",
+    version="0.4.0",
     servers=[{"url": f"http://localhost:{settings.get('INITRY_API_EXTERNAL_PORT')}"}],
 )
 
@@ -88,10 +90,7 @@ app.include_router(stats_router)
 app.include_router(search_router)
 
 
-origins = [
-    "http://localhost:3000",
-    f"http://localhost:{settings.get('INITRY_FRONTEND_EXTERNAL_PORT')}",
-]
+origins = settings.get('INITRY_BACKEND_CORS_LIST')
 
 # https://github.com/tiangolo/fastapi/discussions/10968
 app.add_middleware(

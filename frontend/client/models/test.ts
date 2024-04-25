@@ -15,34 +15,7 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Description } from './description';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Location } from './location';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Log } from './log';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Nodeid } from './nodeid';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Startedat } from './startedat';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Stderr } from './stderr';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Stdout } from './stdout';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Stoppedat } from './stoppedat';
-// May contain unused imports in some cases
-// @ts-ignore
 import { TestStatus } from './test-status';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Testrunuuid } from './testrunuuid';
 
 /**
  * 
@@ -58,63 +31,77 @@ export interface Test {
     'uuid': string;
     /**
      * 
-     * @type {Location}
+     * @type {string}
      * @memberof Test
      */
-    'location'?: Location;
+    'location'?: string | null;
     /**
      * 
-     * @type {Nodeid}
+     * @type {string}
      * @memberof Test
      */
-    'nodeid'?: Nodeid;
+    'nodeid'?: string | null;
     /**
      * 
-     * @type {Testrunuuid}
+     * @type {string}
      * @memberof Test
      */
-    'testRunUuid'?: Testrunuuid;
+    'testRunUuid'?: string | null;
     /**
      * 
-     * @type {Description}
+     * @type {string}
      * @memberof Test
      */
-    'description'?: Description;
+    'description'?: string | null;
     /**
      * 
-     * @type {Startedat}
+     * @type {string}
      * @memberof Test
      */
-    'startedAt'?: Startedat;
+    'startedAt'?: string | null;
     /**
      * 
-     * @type {Stoppedat}
+     * @type {string}
      * @memberof Test
      */
-    'stoppedAt'?: Stoppedat;
+    'stoppedAt'?: string | null;
+    /**
+     * 
+     * @type {number}
+     * @memberof Test
+     */
+    'duration'?: number | null;
     /**
      * 
      * @type {TestStatus}
      * @memberof Test
      */
-    'status'?: TestStatus;
+    'status'?: TestStatus | null;
     /**
      * 
-     * @type {Log}
+     * @type {string}
      * @memberof Test
      */
-    'log'?: Log;
+    'log'?: string | null;
     /**
      * 
-     * @type {Stdout}
+     * @type {string}
      * @memberof Test
      */
-    'stdout'?: Stdout;
+    'logMessage'?: string | null;
     /**
      * 
-     * @type {Stderr}
+     * @type {string}
      * @memberof Test
      */
-    'stderr'?: Stderr;
+    'stdout'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof Test
+     */
+    'stderr'?: string | null;
 }
+
+
 

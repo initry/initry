@@ -24,8 +24,10 @@ class Test(BaseModel):
     description: Optional[str] = None
     startedAt: Optional[datetime] = None
     stoppedAt: Optional[datetime] = None
+    duration: Optional[float] = None
     status: Optional[TestStatus] = None
     log: Optional[str] = None
+    logMessage: Optional[str] = None
     stdout: Optional[str] = None
     stderr: Optional[str] = None
 

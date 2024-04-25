@@ -2,10 +2,9 @@
 import { Box, Paper, Typography } from "@mui/material";
 import { blue, green, grey, red, yellow } from "@mui/material/colors";
 import React from "react";
-import { TestStatus } from "@/client";
 
 interface TestStatusProps {
-  status?: TestStatus;
+  status: string;
 }
 
 const Status = ({ status }: TestStatusProps) => {

@@ -13,21 +13,6 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { Failed } from './failed';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Passed } from './passed';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Skipped } from './skipped';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Startedat } from './startedat';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Stoppedat } from './stoppedat';
 
 /**
  * 
@@ -55,39 +40,51 @@ export interface TestRun {
     'runName': string;
     /**
      * 
-     * @type {Startedat}
+     * @type {string}
      * @memberof TestRun
      */
-    'startedAt'?: Startedat;
+    'startedAt'?: string | null;
     /**
      * 
-     * @type {Stoppedat}
+     * @type {string}
      * @memberof TestRun
      */
-    'stoppedAt'?: Stoppedat;
+    'stoppedAt'?: string | null;
     /**
      * 
-     * @type {Passed}
+     * @type {number}
      * @memberof TestRun
      */
-    'passed'?: Passed;
+    'passed'?: number | null;
     /**
      * 
-     * @type {Failed}
+     * @type {number}
      * @memberof TestRun
      */
-    'failed'?: Failed;
+    'failed'?: number | null;
     /**
      * 
-     * @type {Skipped}
+     * @type {number}
      * @memberof TestRun
      */
-    'skipped'?: Skipped;
+    'skipped'?: number | null;
     /**
      * 
      * @type {string}
      * @memberof TestRun
      */
     'pluginType': string;
+    /**
+     * 
+     * @type {string}
+     * @memberof TestRun
+     */
+    'hostName'?: string | null;
+    /**
+     * 
+     * @type {string}
+     * @memberof TestRun
+     */
+    'testSuite'?: string | null;
 }
 

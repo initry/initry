@@ -3,11 +3,11 @@ import Box from "@mui/material/Box";
 import { Typography } from "@mui/material";
 import { blue } from "@mui/material/colors";
 import { FrameworkLogo } from "@/components/TestRun/FrameworkLogo";
-import { Location, TestRun } from "@/client";
+import { TestRun } from "@/client";
 
 interface RunningTestInfoInterface {
   uuid: string;
-  location?: Location;
+  location?: string;
 }
 
 interface RunningTestsInterface {

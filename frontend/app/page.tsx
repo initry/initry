@@ -6,6 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { TrendBarChart } from "@/components/TrendBarChart";
 import { FailuresChart } from "@/components/FailuresChart";
 import { TestRunRow } from "@/components/TestRunRow";
+import { Loading } from "@/components/Loading/Loading";
 
 const getLatestTestRuns = () => {
   return new TestRunsApi().getLatestTestRuns();
@@ -16,6 +17,8 @@ const getTestRunsTrend = () => {
 };
 
 const Dashboard = () => {
+  const [loadingTestRuns, setLoadingTestRuns] = useState(true);
+  const [loadingCharts, setLoadingCharts] = useState(true);
   const socketRef = useRef<WebSocket | null>(null);
   const [testRuns, setTestRuns] = useState<TestRun[]>([
     {
@@ -65,20 +68,20 @@ const Dashboard = () => {
           const updatedTestRun = { ...updatedTestRuns[existingTrIndex] };
           if (newData.status === "PASSED") {
             updatedTestRun.passed =
-              parseInt(updatedTestRun.passed as string, 10) > 0
-                ? parseInt(updatedTestRun.passed as string, 10) + 1
+              (updatedTestRun.passed as number) > 0
+                ? (updatedTestRun.passed as number) + 1
                 : 1;
           }
           if (newData.status === "FAILED") {
             updatedTestRun.failed =
-              parseInt(updatedTestRun.failed as string, 10) > 0
-                ? parseInt(updatedTestRun.failed as string, 10) + 1
+              (updatedTestRun.failed as number) > 0
+                ? (updatedTestRun.failed as number) + 1
                 : 1;
           }
           if (newData.status === "SKIPPED") {
             updatedTestRun.skipped =
-              parseInt(updatedTestRun.skipped as string, 10) > 0
-                ? parseInt(updatedTestRun.skipped as string, 10) + 1
+              (updatedTestRun.skipped as number) > 0
+                ? (updatedTestRun.skipped as number) + 1
                 : 1;
           }
           if (newData.status === "RUNNING") {
@@ -97,20 +100,26 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchLatestTestRuns = async () => {
+      setLoadingTestRuns(true);
       try {
         const latestTestRuns = await getLatestTestRuns();
         setTestRuns(latestTestRuns.data);
       } catch (error) {
         console.error("Error fetching latest jobs:", error);
+      } finally {
+        setLoadingTestRuns(false);
       }
     };
 
     const fetchTrend = async () => {
       try {
+        setLoadingCharts(true);
         const data = await getTestRunsTrend();
         setTestRunsDataByDay(data.data);
       } catch (error) {
         console.error("Error fetching latest jobs:", error);
+      } finally {
+        setLoadingCharts(false);
       }
     };
 
@@ -119,9 +128,7 @@ const Dashboard = () => {
 
     if (!socketRef.current) {
       socketRef.current = new WebSocket(
-        "ws://localhost:" +
-          process.env.NEXT_PUBLIC_INITRY_API_EXTERNAL_PORT +
-          "/ws/live",
+        `ws://${process.env.NEXT_PUBLIC_INITRY_API_HOST}:${process.env.NEXT_PUBLIC_INITRY_API_EXTERNAL_PORT}/ws/live`,
       );
 
       socketRef.current.onmessage = (event) => {
@@ -159,59 +166,71 @@ const Dashboard = () => {
             gap: "20px",
           }}
         >
-          <Box sx={{ display: "flex" }}>
-            <Typography
-              sx={{ marginTop: "10px", marginBottom: "25px" }}
-              variant="h6"
-            >
-              Test runs:
-            </Typography>
-          </Box>
-          <Box sx={{ display: "flex" }}>
-            <Paper elevation={0} sx={{ width: "98%" }}>
-              {testRuns &&
-                testRuns.map((testRun, idx) => (
-                  <>
-                    <Box
-                      sx={{
-                        display: "flex",
-                        flexDirection: "column",
-                        paddingBottom: "20px",
-                      }}
-                    >
-                      <TestRunRow key={idx} testRun={testRun} />
-                    </Box>
-                    {idx < testRuns.length - 1 && (
-                      <Divider flexItem key={`divider-${testRun.uuid}`} />
-                    )}
-                  </>
-                ))}
-            </Paper>
-          </Box>
+          {loadingTestRuns ? (
+            <Loading />
+          ) : (
+            <>
+              <Box sx={{ display: "flex" }}>
+                <Typography
+                  sx={{ marginTop: "10px", marginBottom: "25px" }}
+                  variant="h6"
+                >
+                  Test runs:
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: "flex" }}>
+                <Paper elevation={0} sx={{ width: "98%" }}>
+                  {testRuns &&
+                    testRuns.map((testRun, idx) => (
+                      <>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "column",
+                            paddingBottom: "20px",
+                          }}
+                        >
+                          <TestRunRow key={idx} testRun={testRun} />
+                        </Box>
+                        {idx < testRuns.length - 1 && (
+                          <Divider flexItem key={`divider-${testRun.uuid}`} />
+                        )}
+                      </>
+                    ))}
+                </Paper>
+              </Box>
+            </>
+          )}
         </Box>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            width: "30%",
-            gap: "20px",
-          }}
-        >
-          <Box sx={{ display: "flex" }}>
-            <Typography sx={{ marginTop: "10px" }} variant="h6">
-              Trend (7d):
-            </Typography>
+
+        {loadingCharts ? (
+          <Loading />
+        ) : (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              width: "30%",
+              gap: "20px",
+            }}
+          >
+            <Box sx={{ display: "flex" }}>
+              <Typography sx={{ marginTop: "10px" }} variant="h6">
+                Trend (7d):
+              </Typography>
+            </Box>
+            <Box sx={{ display: "flex" }}>
+              <TrendBarChart testRunsDataByDay={testRunsDataByDay} />
+            </Box>
+            <Box sx={{ display: "flex" }}>
+              <Typography variant="h6">Failures (7d):</Typography>{" "}
+            </Box>
+            <Box sx={{ display: "flex" }}>
+              <FailuresChart testRunsDataByDay={testRunsDataByDay} />
+            </Box>
           </Box>
-          <Box sx={{ display: "flex" }}>
-            <TrendBarChart testRunsDataByDay={testRunsDataByDay} />
-          </Box>
-          <Box sx={{ display: "flex" }}>
-            <Typography variant="h6">Failures (7d):</Typography>{" "}
-          </Box>
-          <Box sx={{ display: "flex" }}>
-            <FailuresChart testRunsDataByDay={testRunsDataByDay} />
-          </Box>
-        </Box>
+        )}
       </Box>
     </Box>
   );

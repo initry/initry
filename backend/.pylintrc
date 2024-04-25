@@ -1,5 +1,5 @@
 [MAIN]
-ignore=.venv,__pycache__
+ignore=.venv,__pycache__,.protobufs
 ignore-patterns=.*pb2\.py,.*pb2\.pyi,.*pb2_grpc\.py
 disable=
     C0114,

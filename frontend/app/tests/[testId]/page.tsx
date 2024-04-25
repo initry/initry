@@ -3,20 +3,21 @@ import React, { useEffect, useState } from "react";
 import { Divider, IconButton, Paper, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { TestRunsApi } from "@/client/api/test-runs-api";
-import { TestRun, Testrunuuid, TestsApi } from "@/client";
+import { TestRun, TestsApi } from "@/client";
 import { Test } from "@/client";
 import { Loading } from "@/components/Loading/Loading";
 import { TestStatus } from "@/components/Test/Status";
 import Link from "next/link";
 import FileCopyIcon from "@mui/icons-material/FileCopy";
-import { Timings } from "@/components/TestRun/Timings";
+import { TestDetails } from "@/components/TestDetails";
 import { TestRow } from "@/components/TestRow";
 
 const getTestById = (testRunId: string) => {
   return new TestsApi().getTestById(testRunId);
 };
 
-const getTestRunById = (testRunId?: Testrunuuid) => {
+const getTestRunById = (testRunId?: any) => {
+  //TODO any
   return new TestRunsApi().getTestRunById(testRunId);
 };
 
@@ -76,6 +77,7 @@ const TestPage = ({ params }: { params: { testId: string } }) => {
     description: undefined,
     location: undefined,
     log: undefined,
+    logMessage: undefined,
     nodeid: undefined,
     startedAt: undefined,
     status: undefined,
@@ -109,13 +111,11 @@ const TestPage = ({ params }: { params: { testId: string } }) => {
       try {
         const testResponse = await getTestById(params.testId);
         setTest(testResponse.data);
-        setLoading(false);
 
         const testRunResponse = await getTestRunById(
           testResponse?.data.testRunUuid,
         );
         setTestRun(testRunResponse.data);
-        setLoading(false);
 
         const testHistoryResponse = await getTestHistoryByTestId(params.testId);
         setTestHistory(testHistoryResponse.data);
@@ -139,7 +139,7 @@ const TestPage = ({ params }: { params: { testId: string } }) => {
             sx={{
               display: "flex",
               flexDirection: "row",
-              gap: "100px",
+              gap: "80px",
               paddingTop: "10px",
             }}
           >
@@ -149,7 +149,16 @@ const TestPage = ({ params }: { params: { testId: string } }) => {
                   {testRun?.runName}
                 </Link>
               </Typography>
-              <Timings testRun={testRun} />
+              <TestDetails
+                data={{
+                  ...test,
+                  ...{
+                    pluginType: testRun?.pluginType,
+                    testSuite: testRun?.testSuite,
+                    hostName: testRun?.hostName,
+                  },
+                }}
+              />
             </Box>
             <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
               {test.log || test.stdout || test.stderr ? (
@@ -161,6 +170,12 @@ const TestPage = ({ params }: { params: { testId: string } }) => {
                       gap: "10px",
                     }}
                   >
+                    {test.logMessage &&
+                      LogBlock(
+                        test.logMessage as string,
+                        "Assertion",
+                        handleCopy,
+                      )}
                     {test.log &&
                       LogBlock(test.log as string, "Log", handleCopy)}
                     {test.stdout &&
@@ -172,9 +187,17 @@ const TestPage = ({ params }: { params: { testId: string } }) => {
               ) : (
                 ""
               )}
+
               <Typography sx={{ marginTop: "10px" }} variant="h6">
                 History (last 20 executions):
               </Typography>
+              {testHistory.length < 1 && (
+                <>
+                  There are no previously recorded executions for this type of
+                  test.
+                </>
+              )}
+
               <Box sx={{ display: "flex", flexDirection: "column" }}>
                 <Paper elevation={0} sx={{ width: "70vw" }}>
                   {testHistory &&
