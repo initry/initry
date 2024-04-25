@@ -12,7 +12,7 @@ A test automation framework executes test cases and sends test details to **init
 3. `pytest.ini` - a configuration file for `pytest` that includes the plugin settings and located in the tests directory
 
 On `pytest` run:
-**pytest results** parsed to **pytest-initry plugin** then to **initry** and stored in **database**.
+***pytest results*** parsed to ***pytest-initry plugin*** then to ***initry*** and stored in the ***database***.
 
 ## Features
 - Web Application
@@ -21,7 +21,9 @@ On `pytest` run:
 - Uses [gRPC](https://grpc.io/)
 
 ## Supported Test Automation Frameworks
-- [pytest](https://pytest.org/) (via [pytest-initry](https://github.com/initry/pytest-initry/) middleware)
+| Framework                      | Middleware                                                 |
+| ------------------------------ | ---------------------------------------------------------- |
+| [pytest](https://pytest.org/)  | [pytest-initry](https://github.com/initry/pytest-initry/)  |
 
 ## Documentation
 - [Installation](https://initry.io/)
