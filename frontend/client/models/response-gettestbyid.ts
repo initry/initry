@@ -15,37 +15,10 @@
 
 // May contain unused imports in some cases
 // @ts-ignore
-import { Description } from './description';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Location } from './location';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Log } from './log';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Nodeid } from './nodeid';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Startedat } from './startedat';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Stderr } from './stderr';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Stdout } from './stdout';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Stoppedat } from './stoppedat';
-// May contain unused imports in some cases
-// @ts-ignore
 import { Test } from './test';
 // May contain unused imports in some cases
 // @ts-ignore
 import { TestStatus } from './test-status';
-// May contain unused imports in some cases
-// @ts-ignore
-import { Testrunuuid } from './testrunuuid';
 
 /**
  * 
@@ -55,46 +28,52 @@ import { Testrunuuid } from './testrunuuid';
 export interface ResponseGettestbyid {
     /**
      * 
-     * @type {any}
+     * @type {string}
      * @memberof ResponseGettestbyid
      */
-    'uuid': any;
+    'uuid': string;
     /**
      * 
-     * @type {Location}
+     * @type {string}
      * @memberof ResponseGettestbyid
      */
-    'location'?: Location;
+    'location'?: string;
     /**
      * 
-     * @type {Nodeid}
+     * @type {string}
      * @memberof ResponseGettestbyid
      */
-    'nodeid'?: Nodeid;
+    'nodeid'?: string;
     /**
      * 
-     * @type {Testrunuuid}
+     * @type {string}
      * @memberof ResponseGettestbyid
      */
-    'testRunUuid'?: Testrunuuid;
+    'testRunUuid'?: string;
     /**
      * 
-     * @type {Description}
+     * @type {string}
      * @memberof ResponseGettestbyid
      */
-    'description'?: Description;
+    'description'?: string;
     /**
      * 
-     * @type {Startedat}
+     * @type {string}
      * @memberof ResponseGettestbyid
      */
-    'startedAt'?: Startedat;
+    'startedAt'?: string;
     /**
      * 
-     * @type {Stoppedat}
+     * @type {string}
      * @memberof ResponseGettestbyid
      */
-    'stoppedAt'?: Stoppedat;
+    'stoppedAt'?: string;
+    /**
+     * 
+     * @type {number}
+     * @memberof ResponseGettestbyid
+     */
+    'duration'?: number;
     /**
      * 
      * @type {TestStatus}
@@ -103,21 +82,29 @@ export interface ResponseGettestbyid {
     'status'?: TestStatus;
     /**
      * 
-     * @type {Log}
+     * @type {string}
      * @memberof ResponseGettestbyid
      */
-    'log'?: Log;
+    'log'?: string;
     /**
      * 
-     * @type {Stdout}
+     * @type {string}
      * @memberof ResponseGettestbyid
      */
-    'stdout'?: Stdout;
+    'logMessage'?: string;
     /**
      * 
-     * @type {Stderr}
+     * @type {string}
      * @memberof ResponseGettestbyid
      */
-    'stderr'?: Stderr;
+    'stdout'?: string;
+    /**
+     * 
+     * @type {string}
+     * @memberof ResponseGettestbyid
+     */
+    'stderr'?: string;
 }
+
+
 

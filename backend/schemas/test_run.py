@@ -14,6 +14,8 @@ class TestRun(BaseModel):
     failed: Optional[int] = None
     skipped: Optional[int] = None
     pluginType: str
+    hostName: Optional[str] = None
+    testSuite: Optional[str] = None
     # expectedPassed: Optional[int] = None
     # expectedFailed: Optional[int] = None
     # error: Optional[int] = None

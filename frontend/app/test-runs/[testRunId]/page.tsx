@@ -3,14 +3,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { Divider, Paper, Typography } from "@mui/material";
 import Box from "@mui/material/Box";
 import { TestRunsApi } from "@/client/api/test-runs-api";
-import { Test, TestRun, TestsApi, Location } from "@/client";
+import { Test, TestRun, TestsApi } from "@/client";
 import { TestRunStatus } from "@/components/TestRun/Status";
-import { Timings } from "@/components/TestRun/Timings";
+import { TestRunDetails } from "@/components/TestRunDetails";
 import { RunningTestInfo } from "@/components/TestRun/RunningTestInfo";
 import { Loading } from "@/components/Loading/Loading";
 import { TestRow } from "@/components/TestRow";
 import { StatusChart } from "@/components/TestRun/StatusChart";
-import { TestRunRow } from "@/components/TestRunRow";
 
 const getTestRunById = (testRunId: string) => {
   return new TestRunsApi().getTestRunById(testRunId);
@@ -18,6 +17,10 @@ const getTestRunById = (testRunId: string) => {
 
 const getTestRunTests = (testRunId: string) => {
   return new TestsApi().getTestsFromTestRun(testRunId);
+};
+
+const getRunningTestRunTests = (testRunId: string) => {
+  return new TestsApi().getRunningTestsFromTestRun(testRunId);
 };
 
 const TestRunPage = ({ params }: { params: { testRunId: string } }) => {
@@ -36,7 +39,7 @@ const TestRunPage = ({ params }: { params: { testRunId: string } }) => {
   });
   const [tests, setTests] = useState<Test[]>([]);
   const [runningTests, setRunningTests] = useState<
-    { uuid: string; location?: Location }[]
+    { uuid: string; location: string }[]
   >([]);
 
   const handleTestRunData = (data: TestRun) => {
@@ -54,9 +57,12 @@ const TestRunPage = ({ params }: { params: { testRunId: string } }) => {
     try {
       const newData = data;
       if (newData.status === "RUNNING") {
-        setRunningTests((prevState) => [
-          ...prevState,
-          { uuid: newData.uuid, location: newData.location },
+        // setRunningTests((prevState) => [
+        //   ...prevState,
+        //   { uuid: newData.uuid, location: newData.location },
+        // ]);
+        setRunningTests([
+          { uuid: newData.uuid, location: newData.location as string },
         ]);
         setTests((prevState) =>
           prevState.map((test) => {
@@ -83,20 +89,20 @@ const TestRunPage = ({ params }: { params: { testRunId: string } }) => {
           const updatedTestRun = { ...prevState };
           if (newData.status === "PASSED") {
             updatedTestRun.passed =
-              parseInt(updatedTestRun.passed as string, 10) > 0
-                ? parseInt(updatedTestRun.passed as string, 10) + 1
+              (updatedTestRun.passed as number) > 0
+                ? (updatedTestRun.passed as number) + 1
                 : 1;
           }
           if (newData.status === "FAILED") {
             updatedTestRun.failed =
-              parseInt(updatedTestRun.failed as string, 10) > 0
-                ? parseInt(updatedTestRun.failed as string, 10) + 1
+              (updatedTestRun.failed as number) > 0
+                ? (updatedTestRun.failed as number) + 1
                 : 1;
           }
           if (newData.status === "SKIPPED") {
             updatedTestRun.skipped =
-              parseInt(updatedTestRun.skipped as string, 10) > 0
-                ? parseInt(updatedTestRun.skipped as string, 10) + 1
+              (updatedTestRun.skipped as number) > 0
+                ? (updatedTestRun.skipped as number) + 1
                 : 1;
           }
           return updatedTestRun;
@@ -124,19 +130,32 @@ const TestRunPage = ({ params }: { params: { testRunId: string } }) => {
         setTests(data.data);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching test run:", error);
+        console.error("Error fetching tests:", error);
+      }
+    };
+
+    const getRunningTests = async () => {
+      try {
+        const data = await getRunningTestRunTests(params.testRunId);
+        setRunningTests([
+          {
+            uuid: data.data[0]["uuid"],
+            location: data.data[0]["location"] as string,
+          },
+        ]);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching running tests:", error);
       }
     };
 
     getTestRun();
     getTests();
+    getRunningTests().then();
 
     if (!socketRef.current) {
       socketRef.current = new WebSocket(
-        "ws://localhost:" +
-          process.env.NEXT_PUBLIC_INITRY_API_EXTERNAL_PORT +
-          "/ws/test-run/" +
-          params.testRunId,
+        `ws://${process.env.NEXT_PUBLIC_INITRY_API_HOST}:${process.env.NEXT_PUBLIC_INITRY_API_EXTERNAL_PORT}/ws/test-run/${params.testRunId}`,
       );
       socketRef.current.onmessage = (event) => {
         const data = JSON.parse(event.data);
@@ -174,7 +193,7 @@ const TestRunPage = ({ params }: { params: { testRunId: string } }) => {
             sx={{
               display: "flex",
               flexDirection: "row",
-              gap: "100px",
+              gap: "80px",
               paddingTop: "10px",
             }}
           >
@@ -182,9 +201,7 @@ const TestRunPage = ({ params }: { params: { testRunId: string } }) => {
               <Typography sx={{ marginTop: "10px" }} variant="h6">
                 {testRun?.runName}
               </Typography>
-              <Timings testRun={testRun} />
-              {/*<Typography sx={{marginTop: "10px"}} variant="h6">Tests count: {testRun?.testsCount}</Typography>*/}
-              {/*<TestsInfo testRun={testRun}/>*/}
+              <TestRunDetails testRun={testRun} />
               <Box sx={{ paddingTop: "20px" }}>
                 <StatusChart testRun={testRun} />
               </Box>

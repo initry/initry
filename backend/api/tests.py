@@ -32,6 +32,16 @@ def get_tests_from_test_run(test_run: str):
     return tests_service.get_tests_from_test_run(test_run)
 
 
+@tests_router.post(
+    "/running",
+    operation_id="getRunningTestsFromTestRun",
+    response_model=TestsList,
+    tags=["Tests"],
+)
+def get_running_tests_from_test_run(test_run: str):
+    return tests_service.get_running_tests_from_test_run(test_run)
+
+
 @tests_router.get(
     "/{test_id}/history",
     operation_id="getHistoryByTestId",

@@ -12,6 +12,7 @@ message Test {
 
 message CreateTestsRequest {
   repeated Test tests = 1;
+  bool only_tests_info = 2;
 }
 
 service TestsService {

@@ -69,6 +69,43 @@ export const TestsApiAxiosParamCreator = function (configuration?: Configuration
         },
         /**
          * 
+         * @summary Get Running Tests From Test Run
+         * @param {string} testRun 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRunningTestsFromTestRun: async (testRun: string, options: RawAxiosRequestConfig = {}): Promise<RequestArgs> => {
+            // verify required parameter 'testRun' is not null or undefined
+            assertParamExists('getRunningTestsFromTestRun', 'testRun', testRun)
+            const localVarPath = `/api/tests/running`;
+            // use dummy base URL string because the URL constructor only accepts absolute URLs.
+            const localVarUrlObj = new URL(localVarPath, DUMMY_BASE_URL);
+            let baseOptions;
+            if (configuration) {
+                baseOptions = configuration.baseOptions;
+            }
+
+            const localVarRequestOptions = { method: 'POST', ...baseOptions, ...options};
+            const localVarHeaderParameter = {} as any;
+            const localVarQueryParameter = {} as any;
+
+            if (testRun !== undefined) {
+                localVarQueryParameter['test_run'] = testRun;
+            }
+
+
+    
+            setSearchParams(localVarUrlObj, localVarQueryParameter);
+            let headersFromBaseOptions = baseOptions && baseOptions.headers ? baseOptions.headers : {};
+            localVarRequestOptions.headers = {...localVarHeaderParameter, ...headersFromBaseOptions, ...options.headers};
+
+            return {
+                url: toPathString(localVarUrlObj),
+                options: localVarRequestOptions,
+            };
+        },
+        /**
+         * 
          * @summary Get Test By Id
          * @param {any} testId 
          * @param {*} [options] Override http request option.
@@ -163,6 +200,19 @@ export const TestsApiFp = function(configuration?: Configuration) {
         },
         /**
          * 
+         * @summary Get Running Tests From Test Run
+         * @param {string} testRun 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        async getRunningTestsFromTestRun(testRun: string, options?: RawAxiosRequestConfig): Promise<(axios?: AxiosInstance, basePath?: string) => AxiosPromise<Array<Test>>> {
+            const localVarAxiosArgs = await localVarAxiosParamCreator.getRunningTestsFromTestRun(testRun, options);
+            const localVarOperationServerIndex = configuration?.serverIndex ?? 0;
+            const localVarOperationServerBasePath = operationServerMap['TestsApi.getRunningTestsFromTestRun']?.[localVarOperationServerIndex]?.url;
+            return (axios, basePath) => createRequestFunction(localVarAxiosArgs, globalAxios, BASE_PATH, configuration)(axios, localVarOperationServerBasePath || basePath);
+        },
+        /**
+         * 
          * @summary Get Test By Id
          * @param {any} testId 
          * @param {*} [options] Override http request option.
@@ -209,6 +259,16 @@ export const TestsApiFactory = function (configuration?: Configuration, basePath
         },
         /**
          * 
+         * @summary Get Running Tests From Test Run
+         * @param {string} testRun 
+         * @param {*} [options] Override http request option.
+         * @throws {RequiredError}
+         */
+        getRunningTestsFromTestRun(testRun: string, options?: any): AxiosPromise<Array<Test>> {
+            return localVarFp.getRunningTestsFromTestRun(testRun, options).then((request) => request(axios, basePath));
+        },
+        /**
+         * 
          * @summary Get Test By Id
          * @param {any} testId 
          * @param {*} [options] Override http request option.
@@ -245,6 +305,16 @@ export interface TestsApiInterface {
      * @memberof TestsApiInterface
      */
     getHistoryByTestId(testId: any, options?: RawAxiosRequestConfig): AxiosPromise<Array<Test>>;
+
+    /**
+     * 
+     * @summary Get Running Tests From Test Run
+     * @param {string} testRun 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TestsApiInterface
+     */
+    getRunningTestsFromTestRun(testRun: string, options?: RawAxiosRequestConfig): AxiosPromise<Array<Test>>;
 
     /**
      * 
@@ -285,6 +355,18 @@ export class TestsApi extends BaseAPI implements TestsApiInterface {
      */
     public getHistoryByTestId(testId: any, options?: RawAxiosRequestConfig) {
         return TestsApiFp(this.configuration).getHistoryByTestId(testId, options).then((request) => request(this.axios, this.basePath));
+    }
+
+    /**
+     * 
+     * @summary Get Running Tests From Test Run
+     * @param {string} testRun 
+     * @param {*} [options] Override http request option.
+     * @throws {RequiredError}
+     * @memberof TestsApi
+     */
+    public getRunningTestsFromTestRun(testRun: string, options?: RawAxiosRequestConfig) {
+        return TestsApiFp(this.configuration).getRunningTestsFromTestRun(testRun, options).then((request) => request(this.axios, this.basePath));
     }
 
     /**

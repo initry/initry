@@ -22,7 +22,7 @@ type ChipColor =
 
 export const TestStatus = ({ test, testRun }: TestStatusInterface) => {
   const getChipProps = () => {
-    if (!test.stoppedAt) {
+    if (!test.stoppedAt && testRun.pluginType == "pytest") {
       return { label: "Running", color: "info" };
     } else {
       switch (test.status) {

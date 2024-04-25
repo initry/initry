@@ -14,34 +14,71 @@ class TestRunServiceHandler(test_run_pb2_grpc.TestRunServiceServicer):
     def CreateTestRun(self, request, context):
         test_run = MessageToDict(request)
         st.create_test_run(test_run)
+        # if we are sending JUnit XML only, we should create test_run right now, with no tests.
+        if test_run["pluginType"] == "pytest.xml":
+            test_run["runName"] = TestRunsService().generate_run_id()
+            MongoDB().insert_object(test_run, "test_runs")
+            del test_run["_id"]
+            wsm.add(message={"type": "test_run", **test_run}, channel="live")
         return tests_pb2_grpc.responses__pb2.StatusOk(status="ok")
 
     def StopTestRun(self, request, context):
         incoming_test_run = MessageToDict(request)
-
-        # Save test_run data and test statuses count in storage
-        test_statuses = st.save_test_run_and_test_data(
-            incoming_test_run["uuid"], incoming_test_run["stoppedAt"]
-        )
-        wsm.add(
-            message={"type": "test_run", **incoming_test_run, **test_statuses},
-            channel="live",
-        )
-        BackgroundTask(
-            MongoDB().modify_object(
-                {"uuid": incoming_test_run["uuid"]},
-                {**test_statuses, "stoppedAt": incoming_test_run["stoppedAt"]},
-                "test_runs",
+        test_run = st.get_test_run(incoming_test_run["uuid"])
+        if test_run["pluginType"] != "pytest.xml":
+            # Save test_run data and test statuses count in storage
+            test_statuses = st.save_test_run_and_test_data(
+                incoming_test_run["uuid"], incoming_test_run["stoppedAt"]
             )
-        )
-        tests_to_save_in_db = st.get_tests_linked_to_test_run(incoming_test_run["uuid"])
-        update_tests_by_id.delay(tests_to_save_in_db, "tests")
-        wsm.add(
-            message={"type": "test_run", **incoming_test_run, **test_statuses},
-            channel=f"test-run/{incoming_test_run['uuid']}",
-        )
-        BackgroundTask(st.remove_tests(incoming_test_run["uuid"]))
+            wsm.add(
+                message={"type": "test_run", **incoming_test_run, **test_statuses},
+                channel="live",
+            )
+            BackgroundTask(
+                MongoDB().modify_object(
+                    {"uuid": incoming_test_run["uuid"]},
+                    {**test_statuses, "stoppedAt": incoming_test_run["stoppedAt"]},
+                    "test_runs",
+                )
+            )
+            tests_to_save_in_db = st.get_tests_linked_to_test_run(
+                incoming_test_run["uuid"]
+            )
+            update_tests_by_id.delay(tests_to_save_in_db, "tests")
+            wsm.add(
+                message={"type": "test_run", **incoming_test_run, **test_statuses},
+                channel=f"test-run/{incoming_test_run['uuid']}",
+            )
+        else:
+            # Get data from database, because memory storage wasn't used for xml only test run
+            test_run = TestRunsService().get_test_run_by_id(incoming_test_run["uuid"])
+            test_statuses = {
+                "passed": test_run["passed"],
+                "failed": test_run["failed"],
+                "skipped": test_run["skipped"],
+            }
+            wsm.add(
+                message={
+                    "type": "test_run",
+                    **incoming_test_run,
+                    **test_statuses,
+                    "testsCount": test_run["testsCount"],
+                },
+                channel="live",
+            )
+            BackgroundTask(
+                MongoDB().modify_object(
+                    {"uuid": incoming_test_run["uuid"]},
+                    {"stoppedAt": incoming_test_run["stoppedAt"]},
+                    "test_runs",
+                )
+            )
+            wsm.add(
+                message={"type": "test_run", **incoming_test_run, **test_statuses},
+                channel=f"test-run/{incoming_test_run['uuid']}",
+            )
         BackgroundTask(st.remove_test_run(incoming_test_run["uuid"]))
+        BackgroundTask(st.remove_tests(incoming_test_run["uuid"]))
         return tests_pb2_grpc.responses__pb2.StatusOk(status="ok")
 
 
@@ -49,6 +86,9 @@ class TestsServiceHandler(tests_pb2_grpc.TestsServiceServicer):
     def CreateTests(self, request, context):
         tests = MessageToDict(request)
         st.create_tests(tests["tests"])
+        if "onlyTestsInfo" in tests:
+            if tests["onlyTestsInfo"]:
+                return tests_pb2_grpc.responses__pb2.StatusOk(status="ok")
         test_run = st.get_test_run(tests["tests"][0]["testRunUuid"])
         this_run_num = TestRunsService().generate_run_id()
         test_run["runName"] = this_run_num

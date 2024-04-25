@@ -22,19 +22,23 @@ dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
 function LinearProgressWithLabel(
-  props: LinearProgressProps & { value: number; failed: number },
+  props: LinearProgressProps & {
+    value: number;
+    failed: number;
+    pluginType: string;
+  },
 ) {
   return (
     <LinearProgress
       color={props.failed === 0 ? "primary" : "inherit"}
-      variant="determinate"
+      variant={props.pluginType === "pytest.xml" ? undefined : "determinate"}
       sx={{
         position: "absolute",
         top: 0,
         left: 0,
         right: 0,
         color: props.failed > 0 ? red[500] : "",
-        height: "5px",
+        height: props.pluginType === "pytest.xml" ? "2px" : "5px",
       }}
       {...props}
     />
@@ -57,11 +61,18 @@ export const TestRunRow = ({ testRun }: TestRunRowProps) => {
   const envName = "";
 
   return (
-    <Link href={`/test-runs/${testRun.uuid}`}>
+    <Link
+      href={
+        testRun.pluginType === "pytest.xml" && !testRun.stoppedAt
+          ? ""
+          : `/test-runs/${testRun.uuid}`
+      }
+    >
       <Card variant="outlined">
         <Box sx={{ position: "relative" }}>
           {!stoppedAt && (
             <LinearProgressWithLabel
+              pluginType={testRun.pluginType}
               value={progress}
               failed={testRun.failed ? (testRun.failed as number) : 0}
             />
@@ -100,7 +111,13 @@ export const TestRunRow = ({ testRun }: TestRunRowProps) => {
                       </Typography>
                     ) : (
                       <Typography sx={{}} color="text.secondary">
-                        {testsCount !== undefined ? testsCount : "0"} tests
+                        {testRun.pluginType !== "pytest.xml"
+                          ? testsCount !== undefined
+                            ? `${testsCount} tests`
+                            : `0 tests`
+                          : testsCount !== undefined
+                            ? `${testsCount} tests`
+                            : `waiting for xml report`}
                       </Typography>
                     )}
                     <Typography variant="h5">{testRun.runName}</Typography>
@@ -120,69 +137,76 @@ export const TestRunRow = ({ testRun }: TestRunRowProps) => {
                     ) : (
                       <Typography>&nbsp;</Typography>
                     )}
-                    <Box
-                      sx={{
-                        display: "flex",
-                        paddingTop: "5px",
-                        flexDirection: "row",
-                        gap: "10px",
-                      }}
-                    >
-                      <Box>
-                        <Paper
-                          elevation={0}
-                          sx={{
-                            width: "100%",
-                            height: "25px",
-                            textAlign: "center",
-                            paddingLeft: "4px",
-                            paddingRight: "4px",
-                          }}
-                          variant={"outlined"}
-                        >
-                          <Typography color={green[500]}>
-                            PASSED:{" "}
-                            {testRun.passed ? (testRun.passed as number) : 0}
-                          </Typography>
-                        </Paper>
+                    {testRun.pluginType === "pytest.xml" &&
+                    !testRun.stoppedAt ? (
+                      <></>
+                    ) : (
+                      <Box
+                        sx={{
+                          display: "flex",
+                          paddingTop: "5px",
+                          flexDirection: "row",
+                          gap: "10px",
+                        }}
+                      >
+                        <Box>
+                          <Paper
+                            elevation={0}
+                            sx={{
+                              width: "100%",
+                              height: "25px",
+                              textAlign: "center",
+                              paddingLeft: "4px",
+                              paddingRight: "4px",
+                            }}
+                            variant={"outlined"}
+                          >
+                            <Typography color={green[500]}>
+                              PASSED:{" "}
+                              {testRun.passed ? (testRun.passed as number) : 0}
+                            </Typography>
+                          </Paper>
+                        </Box>
+                        <Box>
+                          <Paper
+                            elevation={0}
+                            sx={{
+                              width: "100%",
+                              height: "25px",
+                              textAlign: "center",
+                              paddingLeft: "4px",
+                              paddingRight: "4px",
+                            }}
+                            variant={"outlined"}
+                          >
+                            <Typography color={red[500]}>
+                              FAILED:{" "}
+                              {testRun.failed ? (testRun.failed as number) : 0}
+                            </Typography>
+                          </Paper>
+                        </Box>
+                        <Box>
+                          <Paper
+                            elevation={0}
+                            sx={{
+                              width: "100%",
+                              height: "25px",
+                              textAlign: "center",
+                              paddingLeft: "4px",
+                              paddingRight: "4px",
+                            }}
+                            variant={"outlined"}
+                          >
+                            <Typography color={yellow[800]}>
+                              SKIPPED:{" "}
+                              {testRun.skipped
+                                ? (testRun.skipped as number)
+                                : 0}
+                            </Typography>
+                          </Paper>
+                        </Box>
                       </Box>
-                      <Box>
-                        <Paper
-                          elevation={0}
-                          sx={{
-                            width: "100%",
-                            height: "25px",
-                            textAlign: "center",
-                            paddingLeft: "4px",
-                            paddingRight: "4px",
-                          }}
-                          variant={"outlined"}
-                        >
-                          <Typography color={red[500]}>
-                            FAILED:{" "}
-                            {testRun.failed ? (testRun.failed as number) : 0}
-                          </Typography>
-                        </Paper>
-                      </Box>
-                      <Box>
-                        <Paper
-                          elevation={0}
-                          sx={{
-                            width: "100%",
-                            height: "25px",
-                            textAlign: "center",
-                            paddingLeft: "4px",
-                            paddingRight: "4px",
-                          }}
-                          variant={"outlined"}
-                        >
-                          <Typography color={yellow[800]}>
-                            SKIPPED:{" "}
-                            {testRun.skipped ? (testRun.skipped as number) : 0}
-                          </Typography>
-                        </Paper>
-                      </Box>
-                    </Box>
+                    )}
                   </Box>
                   <Box
                     sx={{
@@ -227,7 +251,10 @@ export const TestRunRow = ({ testRun }: TestRunRowProps) => {
                     >
                       <Typography sx={{}} color="text.secondary">
                         Duration:{" "}
-                        {formatDuration(startedAt as string, stoppedAt)}
+                        {formatDuration(
+                          startedAt as string,
+                          stoppedAt as string,
+                        )}
                       </Typography>
                     </Box>
                   </Box>

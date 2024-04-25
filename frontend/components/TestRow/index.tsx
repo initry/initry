@@ -8,7 +8,8 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
 import { RowStatus } from "@/components/RowStatus";
 import { TestStatusLabel } from "@/components/TestRow/TestStatus";
-import { formatDuration } from "@/tools/format-duration";
+import { formatDuration, formatSeconds } from "@/tools/format-duration";
+import { usePathname } from "next/navigation";
 
 interface TestRowProps {
   testRun: TestRun;
@@ -20,7 +21,7 @@ dayjs.extend(duration);
 
 export const TestRow = ({ test, testRun }: TestRowProps) => {
   const { stoppedAt, startedAt } = test;
-
+  const pathname = usePathname();
   return (
     <Link href={`/tests/${test.uuid}`}>
       <Card variant="outlined">
@@ -44,9 +45,9 @@ export const TestRow = ({ test, testRun }: TestRowProps) => {
                     </Typography>
                   </Box>
                   <Box sx={{ display: "flex", flexDirection: "column" }}>
-                    <TestStatusLabel status={test.status} />
+                    <TestStatusLabel status={test.status as string} />
                   </Box>
-                  {testRun.stoppedAt && (
+                  {testRun.stoppedAt && testRun.pluginType === "pytest" && (
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
                       <Typography sx={{}} color="text.secondary">
                         {test.stoppedAt
@@ -59,7 +60,17 @@ export const TestRow = ({ test, testRun }: TestRowProps) => {
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
                       <Typography sx={{}} color="text.secondary">
                         Duration:{" "}
-                        {formatDuration(startedAt as string, stoppedAt)}
+                        {formatDuration(
+                          test.startedAt as string,
+                          test.stoppedAt as string,
+                        )}
+                      </Typography>
+                    </Box>
+                  )}
+                  {testRun.pluginType === "pytest-xml" && (
+                    <Box sx={{ display: "flex", flexDirection: "column" }}>
+                      <Typography sx={{}} color="text.secondary">
+                        Duration: {formatSeconds(test.duration as number)}
                       </Typography>
                     </Box>
                   )}

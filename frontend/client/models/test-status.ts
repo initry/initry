@@ -13,15 +13,24 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { TestStatus } from './test-status';
 
 /**
  * 
  * @export
- * @interface TestStatus
+ * @enum {string}
  */
-export interface TestStatus {
-}
+
+export const TestStatus = {
+    Running: 'RUNNING',
+    Passed: 'PASSED',
+    Failed: 'FAILED',
+    Skipped: 'SKIPPED',
+    ExpectedPassed: 'EXPECTED_PASSED',
+    ExpectedFailed: 'EXPECTED_FAILED',
+    Error: 'ERROR'
+} as const;
+
+export type TestStatus = typeof TestStatus[keyof typeof TestStatus];
+
+
 

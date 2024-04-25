@@ -13,9 +13,6 @@
  */
 
 
-// May contain unused imports in some cases
-// @ts-ignore
-import { Status } from './status';
 
 /**
  * 
@@ -31,9 +28,9 @@ export interface SearchRequest {
     'name': string;
     /**
      * 
-     * @type {Status}
+     * @type {string}
      * @memberof SearchRequest
      */
-    'status'?: Status;
+    'status'?: string | null;
 }
 

@@ -11,8 +11,7 @@ RUN apt-get update
 RUN apt-get install -y openjdk-17-jdk
 RUN update-alternatives --config java
 WORKDIR /app/openapi-codegen
-RUN npx --yes @openapitools/openapi-generator-cli@2.13.1 version-manager set 7.4.0
-RUN npx --yes @openapitools/openapi-generator-cli@2.13.1 generate -i openapi.json -g typescript-axios -c config.json -o client
+RUN npx --yes @openapitools/openapi-generator-cli@2.13.4 generate -i openapi.json -g typescript-axios -c config.json -o client
 WORKDIR /app
 RUN cp -r openapi-codegen/client /app/client
 

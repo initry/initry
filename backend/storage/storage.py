@@ -58,6 +58,14 @@ class InMemoryStorage:
                 return item
         return None
 
+    def get_test_by_nodeid_and_test_run_uuid(
+        self, nodeid: str, test_run_uuid: str
+    ) -> Test | None:
+        for item in self.tests:
+            if item["nodeid"] == nodeid and item["testRunUuid"] == test_run_uuid:
+                return item
+        return None
+
     def modify_test(self, modified_test: Test):
         with self.lock:
             test_dict = {test["uuid"]: test for test in self.tests}
@@ -93,6 +101,22 @@ class InMemoryStorage:
                         "stoppedAt": item.get("stoppedAt", None),
                     }
                 )
+        return tests_storage_data
+
+    def get_running_tests_by_test_run_id(
+        self, test_run_uuid: str
+    ) -> list[dict[str, Any]]:
+        tests_storage_data = []
+        for item in self.tests:
+            if item["testRunUuid"] == test_run_uuid and "startedAt" in item:
+                if item["startedAt"] is not None and "stoppedAt" not in item:
+                    tests_storage_data.append(
+                        {
+                            "uuid": item["uuid"],
+                            "status": item["status"],
+                            "location": item["location"],
+                        }
+                    )
         return tests_storage_data
 
     # Other

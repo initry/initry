@@ -7,7 +7,6 @@ from google.protobuf import descriptor as _descriptor
 from google.protobuf import descriptor_pool as _descriptor_pool
 from google.protobuf import symbol_database as _symbol_database
 from google.protobuf.internal import builder as _builder
-
 # @@protoc_insertion_point(imports)
 
 _sym_db = _symbol_database.Default()
@@ -15,19 +14,18 @@ _sym_db = _symbol_database.Default()
 
 import responses_pb2 as responses__pb2
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(
-    b'\n\x0btests.proto\x1a\x0fresponses.proto"b\n\x04Test\x12\x0e\n\x06nodeid\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x01(\t\x12\x0c\n\x04uuid\x18\x03 \x01(\t\x12\x15\n\rtest_run_uuid\x18\x04 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x05 \x01(\t"*\n\x12\x43reateTestsRequest\x12\x14\n\x05tests\x18\x01 \x03(\x0b\x32\x05.Test2=\n\x0cTestsService\x12-\n\x0b\x43reateTests\x12\x13.CreateTestsRequest\x1a\t.StatusOkb\x06proto3'
-)
+
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0btests.proto\x1a\x0fresponses.proto\"b\n\x04Test\x12\x0e\n\x06nodeid\x18\x01 \x01(\t\x12\x10\n\x08location\x18\x02 \x01(\t\x12\x0c\n\x04uuid\x18\x03 \x01(\t\x12\x15\n\rtest_run_uuid\x18\x04 \x01(\t\x12\x13\n\x0b\x64\x65scription\x18\x05 \x01(\t\"C\n\x12\x43reateTestsRequest\x12\x14\n\x05tests\x18\x01 \x03(\x0b\x32\x05.Test\x12\x17\n\x0fonly_tests_info\x18\x02 \x01(\x08\x32=\n\x0cTestsService\x12-\n\x0b\x43reateTests\x12\x13.CreateTestsRequest\x1a\t.StatusOkb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
-_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, "tests_pb2", _globals)
+_builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'tests_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
-    DESCRIPTOR._options = None
-    _globals["_TEST"]._serialized_start = 32
-    _globals["_TEST"]._serialized_end = 130
-    _globals["_CREATETESTSREQUEST"]._serialized_start = 132
-    _globals["_CREATETESTSREQUEST"]._serialized_end = 174
-    _globals["_TESTSSERVICE"]._serialized_start = 176
-    _globals["_TESTSSERVICE"]._serialized_end = 237
+  DESCRIPTOR._options = None
+  _globals['_TEST']._serialized_start=32
+  _globals['_TEST']._serialized_end=130
+  _globals['_CREATETESTSREQUEST']._serialized_start=132
+  _globals['_CREATETESTSREQUEST']._serialized_end=199
+  _globals['_TESTSSERVICE']._serialized_start=201
+  _globals['_TESTSSERVICE']._serialized_end=262
 # @@protoc_insertion_point(module_scope)

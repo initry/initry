@@ -24,7 +24,6 @@ import { SearchApi, Test } from "@/client";
 import dayjs from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { TestStatus } from "@/components/Test/Status";
 import { TestStatusLabel } from "@/components/TestRow/TestStatus";
 import { formatDuration } from "@/tools/format-duration";
 
@@ -99,7 +98,7 @@ const SearchPage = () => {
         Cell: ({ cell }) => {
           return (
             <Box sx={{ width: "100px" }}>
-              <TestStatusLabel status={cell.getValue() as typeof TestStatus} />
+              <TestStatusLabel status={cell.getValue() as string} />
             </Box>
           );
         },
@@ -148,7 +147,7 @@ const SearchPage = () => {
         filterFn: (row, id, filterValue) => {
           const formattedDuration = formatDuration(
             row.original.startedAt as string,
-            row.original.stoppedAt,
+            row.original.stoppedAt as string,
           );
           return formattedDuration.includes(filterValue);
         },
