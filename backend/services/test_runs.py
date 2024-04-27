@@ -1,5 +1,4 @@
 import datetime
-import uuid
 
 import pymongo
 from pymongo.collection import Collection
@@ -100,7 +99,6 @@ class TestRunsService(AppService):
         try:
             testsuite = xml["testsuites"]["testsuite"]
             test_run = {
-                # "stoppedAt": self.convert_date(testsuite["@timestamp"], testsuite["@time"]),
                 "startedAt": self.convert_date(testsuite["@timestamp"]),
                 "testsCount": int(testsuite["@tests"]),
                 "passed": (
@@ -133,69 +131,53 @@ class TestRunsService(AppService):
 
     def xml_create_tests(self, json_data, test_run_uuid):
         try:
-            tests_data = json_data["testsuites"]["testsuite"]["testcase"]
             tests_for_db = []
             failures_for_db = []
             skipped_for_db = []
+
+            def process_test_data(t):
+                st_inf = TestsService().get_test_by_nodeid_and_test_run_uuid(
+                    t["@classname"] + "." + t["@name"], test_run_uuid
+                )
+                item = {
+                    "location": st_inf["location"],
+                    "nodeid": st_inf["nodeid"],
+                    "status": self.xml_status(t),
+                    "testRunUuid": test_run_uuid,
+                    "uuid": st_inf["uuid"],
+                    "duration": float(t["@time"]),
+                }
+                tests_for_db.append(item)
+
+                if "failure" in t:
+                    failure_dict = {"uuid": st_inf["uuid"]}
+                    failure_dict["log"] = t["failure"]["#text"]
+                    failure_dict["logMessage"] = t["failure"]["@message"]
+                    if t["system-out"] != PYTEST_EMPTY_SYSTEM_OUT:
+                        failure_dict["stdout"] = t["system-out"]
+                    if t["system-err"] != PYTEST_EMPTY_SYSTEM_ERROR:
+                        failure_dict["stderr"] = t["system-err"]
+                    failures_for_db.append(failure_dict)
+
+                if "skipped" in t:
+                    skipped_dict = {"uuid": st_inf["uuid"]}
+                    skipped_dict["log"] = t["skipped"]["#text"]
+                    skipped_dict["logMessage"] = t["skipped"]["@message"]
+                    skipped_for_db.append(skipped_dict)
+
+            tests_data = json_data["testsuites"]["testsuite"]["testcase"]
             if isinstance(tests_data, list):
                 for t in tests_data:
-                    st_inf = TestsService().get_test_by_nodeid_and_test_run_uuid(
-                        t["@classname"] + "." + t["@name"], test_run_uuid
-                    )
-                    item = dict()
-                    item["location"] = st_inf["location"]
-                    item["nodeid"] = st_inf["nodeid"]
-                    item["status"] = self.xml_status(t)
-                    item["testRunUuid"] = test_run_uuid
-                    item["uuid"] = st_inf["uuid"]
-                    item["duration"] = float(t["@time"])
-                    tests_for_db.append(item)
-                    if "failure" in t:
-                        failure_dict = {"uuid": st_inf["uuid"]}
-                        failure_dict["log"] = t["failure"]["#text"]
-                        failure_dict["logMessage"] = t["failure"]["@message"]
-                        if t["system-out"] != PYTEST_EMPTY_SYSTEM_OUT:
-                            failure_dict["stdout"] = t["system-out"]
-                        if t["system-err"] != PYTEST_EMPTY_SYSTEM_ERROR:
-                            failure_dict["stderr"] = t["system-err"]
-                        failures_for_db.append(failure_dict)
-                    if "skipped" in t:
-                        skipped_dict = {"uuid": st_inf["uuid"]}
-                        skipped_dict["log"] = t["skipped"]["#text"]
-                        skipped_dict["logMessage"] = t["skipped"]["@message"]
-                        skipped_for_db.append(skipped_dict)
+                    process_test_data(t)
             else:
-                st_inf = TestsService().get_test_by_nodeid_and_test_run_uuid(
-                    tests_data["@classname"] + "." + tests_data["@name"], test_run_uuid
-                )
-                item = dict()
-                item["location"] = st_inf["location"]
-                item["nodeid"] = st_inf["nodeid"]
-                item["status"] = self.xml_status(tests_data)
-                item["testRunUuid"] = test_run_uuid
-                item["uuid"] = st_inf["uuid"]
-                item["duration"] = float(tests_data["@time"])
-                tests_for_db.append(item)
-                if "failure" in tests_data:
-                    failure_dict = {"uuid": st_inf["uuid"]}
-                    failure_dict["log"] = tests_data["failure"]["#text"]
-                    failure_dict["logMessage"] = tests_data["failure"]["@message"]
-                    if tests_data["system-out"] != PYTEST_EMPTY_SYSTEM_OUT:
-                        failure_dict["stdout"] = tests_data["system-out"]
-                    if tests_data["system-err"] != PYTEST_EMPTY_SYSTEM_ERROR:
-                        failure_dict["stderr"] = tests_data["system-err"]
-                    failures_for_db.append(failure_dict)
-                if "skipped" in tests_data:
-                    skipped_dict = {"uuid": st_inf["uuid"]}
-                    skipped_dict["log"] = tests_data["skipped"]["#text"]
-                    skipped_dict["logMessage"] = tests_data["skipped"]["@message"]
-                    skipped_for_db.append(skipped_dict)
+                process_test_data(tests_data)
+
             self.mongo.save_objects(items=tests_for_db, collection_name="tests")
-            if len(failures_for_db) > 0:
+            if failures_for_db:
                 self.mongo.save_objects(
                     items=failures_for_db, collection_name="test_logs"
                 )
-            if len(skipped_for_db) > 0:
+            if skipped_for_db:
                 self.mongo.save_objects(
                     items=skipped_for_db, collection_name="test_logs"
                 )
@@ -203,27 +185,30 @@ class TestRunsService(AppService):
             print(e)
 
     def xml_create_test_logs(self, json_data):
-        tests_data = json_data["testsuites"]["testsuite"]["testcase"]
-        failures_for_db = []
-        if isinstance(tests_data, list):
-            for t in tests_data:
-                if "failure" in t:
-                    failures_for_db.append(
-                        {
-                            "log": t["failure"]["#text"],
-                            "message": t["failure"]["@message"],
-                            "nodeid": t["@classname"],
-                        }
-                    )
-        else:
-            failures_for_db.append(
-                {
-                    "log": tests_data["failure"]["#text"],
-                    "message": tests_data["failure"]["@message"],
-                    "nodeid": tests_data["@classname"],
-                }
-            )
-        self.mongo.save_objects(items=failures_for_db, collection_name="test_logs")
+        try:
+            tests_data = json_data["testsuites"]["testsuite"]["testcase"]
+            failures_for_db = []
+
+            def process_failure_data(t):
+                failures_for_db.append(
+                    {
+                        "log": t["failure"]["#text"],
+                        "message": t["failure"]["@message"],
+                        "nodeid": t["@classname"],
+                    }
+                )
+
+            if isinstance(tests_data, list):
+                for t in tests_data:
+                    if "failure" in t:
+                        process_failure_data(t)
+            else:
+                if "failure" in tests_data:
+                    process_failure_data(tests_data)
+
+            self.mongo.save_objects(items=failures_for_db, collection_name="test_logs")
+        except Exception as e:
+            print(e)
 
     def raw_data_save(self, json_data, xml_data, test_run_uuid):
         try:

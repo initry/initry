@@ -90,7 +90,7 @@ app.include_router(stats_router)
 app.include_router(search_router)
 
 
-origins = settings.get('INITRY_BACKEND_CORS_LIST')
+origins = settings.get("INITRY_BACKEND_CORS_LIST")
 
 # https://github.com/tiangolo/fastapi/discussions/10968
 app.add_middleware(

@@ -143,7 +143,6 @@ const SearchPage = () => {
           ),
         accessorKey: "stoppedAt",
         header: "Duration",
-        id: "1",
         filterFn: (row, id, filterValue) => {
           const formattedDuration = formatDuration(
             row.original.startedAt as string,
@@ -183,6 +182,14 @@ const SearchPage = () => {
       showProgressBars: isRefetching,
       sorting,
     },
+    muiTableBodyRowProps: ({ row }) => ({
+      onClick: (event) => {
+        window.open("/tests/" + row.original.uuid, "_blank");
+      },
+      sx: {
+        cursor: "pointer",
+      },
+    }),
   });
 
   return (

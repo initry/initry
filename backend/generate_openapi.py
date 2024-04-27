@@ -14,7 +14,9 @@ with open("openapi.json", "w") as f:
             description=app.description,
             routes=app.routes,
             servers=[
-                {"url": f"http://{os.getenv('INITRY_API_HOST')}:{os.getenv('INITRY_API_EXTERNAL_PORT')}"}
+                {
+                    "url": f"http://{os.getenv('INITRY_API_HOST')}:{os.getenv('INITRY_API_EXTERNAL_PORT')}"
+                }
             ],
         ),
         f,
