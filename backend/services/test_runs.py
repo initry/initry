@@ -166,7 +166,7 @@ class TestRunsService(AppService):
                         failure_dict["stderr"] = t["system-err"]
                     failures_for_db.append(failure_dict)
 
-                elif "skipped" in t:
+                if "skipped" in t:
                     skipped_dict = {"uuid": st_inf["uuid"]}
                     skipped_dict["log"] = t["skipped"]["#text"]
                     skipped_dict["logMessage"] = t["skipped"]["@message"]
