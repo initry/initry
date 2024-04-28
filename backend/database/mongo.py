@@ -271,6 +271,21 @@ class MongoDB:
             handle_mongodb_exception(e)
             return None
 
+    def count_documents_in_collection(self, query, collection_name):
+        """
+        Count documents in a collection based on a specific query.
+        :param query: dict
+        :param collection_name: str
+        :return: int
+        """
+        try:
+            collection = self.db[collection_name]
+            count = collection.count_documents(query)
+            return count
+        except PyMongoError as e:
+            handle_mongodb_exception(e)
+            return None
+
 
 def db():
     return MongoDB().db

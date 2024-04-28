@@ -129,6 +129,11 @@ class TestRunsService(AppService):
         if "skipped":
             return "SKIPPED"
 
+    def xml_get_raw_test_run(self, test_run_uuid):
+        return self.mongo.count_documents_in_collection(
+            {"uuid": test_run_uuid}, "test_runs_raw"
+        )
+
     def xml_create_tests(self, json_data, test_run_uuid):
         try:
             tests_for_db = []
@@ -139,6 +144,8 @@ class TestRunsService(AppService):
                 st_inf = TestsService().get_test_by_nodeid_and_test_run_uuid(
                     t["@classname"] + "." + t["@name"], test_run_uuid
                 )
+                if st_inf is None:
+                    print("TODO None from get_test_by_nodeid_and_test_run_uuid")
                 item = {
                     "location": st_inf["location"],
                     "nodeid": st_inf["nodeid"],
@@ -159,7 +166,7 @@ class TestRunsService(AppService):
                         failure_dict["stderr"] = t["system-err"]
                     failures_for_db.append(failure_dict)
 
-                if "skipped" in t:
+                elif "skipped" in t:
                     skipped_dict = {"uuid": st_inf["uuid"]}
                     skipped_dict["log"] = t["skipped"]["#text"]
                     skipped_dict["logMessage"] = t["skipped"]["@message"]
@@ -181,32 +188,6 @@ class TestRunsService(AppService):
                 self.mongo.save_objects(
                     items=skipped_for_db, collection_name="test_logs"
                 )
-        except Exception as e:
-            print(e)
-
-    def xml_create_test_logs(self, json_data):
-        try:
-            tests_data = json_data["testsuites"]["testsuite"]["testcase"]
-            failures_for_db = []
-
-            def process_failure_data(t):
-                failures_for_db.append(
-                    {
-                        "log": t["failure"]["#text"],
-                        "message": t["failure"]["@message"],
-                        "nodeid": t["@classname"],
-                    }
-                )
-
-            if isinstance(tests_data, list):
-                for t in tests_data:
-                    if "failure" in t:
-                        process_failure_data(t)
-            else:
-                if "failure" in tests_data:
-                    process_failure_data(tests_data)
-
-            self.mongo.save_objects(items=failures_for_db, collection_name="test_logs")
         except Exception as e:
             print(e)
 

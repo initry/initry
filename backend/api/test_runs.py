@@ -37,6 +37,9 @@ async def upload_xml(
     file: UploadFile = File(...), uuid: str = Form(...), mode: str = Form(...)
 ):
     try:
+        count = test_run_service.xml_get_raw_test_run(uuid)
+        if count > 0:
+            return
         async with aiofiles.tempfile.NamedTemporaryFile("wb", delete=False) as f:
             while chunk := await file.read(CHUNK_SIZE):
                 await f.write(chunk)
@@ -48,13 +51,18 @@ async def upload_xml(
             except Exception as e:
                 print(e)
             if mode == "xml_only":
+                count = test_run_service.xml_get_raw_test_run(uuid)
+                if count > 0:
+                    return
                 test_run_service.xml_modify_test_run(json_data, uuid)  # move to celery
                 test_run_service.xml_create_tests(json_data, uuid)  # move to celery
-                # test_run_service.xml_create_test_logs(json_data)
                 test_run_service.raw_data_save(
                     json_data=json_data, xml_data=reader, test_run_uuid=uuid
                 )  # move to celery
             if mode == "store":
+                count = test_run_service.xml_get_raw_test_run(uuid)
+                if count > 0:
+                    return
                 test_run = {}
                 testsuite = json_data["testsuites"]["testsuite"]
                 if testsuite["@name"]:
@@ -65,7 +73,7 @@ async def upload_xml(
                 test_run_service.raw_data_save(
                     json_data=json_data, xml_data=reader, test_run_uuid=uuid
                 )  # move to celery
-    except Exception:
+    except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="There was an error uploading the file",

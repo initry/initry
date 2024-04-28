@@ -145,7 +145,7 @@ export const TestDetails = ({ data }: Props) => {
               <Chip
                 size="small"
                 label="pytest-initry + JUnit XML"
-                color="success"
+                color="info"
                 variant="outlined"
               />
             </>
