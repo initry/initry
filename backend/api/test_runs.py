@@ -9,7 +9,7 @@ from services.test_runs import TestRunsService
 test_run_router = APIRouter(prefix="/api/test-runs")
 test_run_service = TestRunsService()
 
-CHUNK_SIZE = 1024 * 3200
+CHUNK_SIZE = 1024 * 1024
 
 
 @test_run_router.get(
@@ -43,7 +43,6 @@ async def upload_xml(
         async with aiofiles.tempfile.NamedTemporaryFile("wb", delete=False) as f:
             while chunk := await file.read(CHUNK_SIZE):
                 await f.write(chunk)
-                await f.seek(0)
         async with aiofiles.open(f.name, "r", encoding="utf8") as f2:
             reader = await f2.read()
             try:

@@ -126,7 +126,7 @@ export const TestDetails = ({ data }: Props) => {
             <Chip
               size="small"
               label="pytest-initry"
-              color="success"
+              color="info"
               variant="outlined"
             />
           )}

@@ -67,7 +67,7 @@ export const TestRow = ({ test, testRun }: TestRowProps) => {
                       </Typography>
                     </Box>
                   )}
-                  {testRun.pluginType === "pytest-xml" && (
+                  {testRun.pluginType === "pytest.xml" && (
                     <Box sx={{ display: "flex", flexDirection: "column" }}>
                       <Typography sx={{}} color="text.secondary">
                         Duration: {formatSeconds(test.duration as number)}

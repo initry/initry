@@ -34,6 +34,9 @@ message ModifyTestRequest {
   google.protobuf.Timestamp started_at = 2;
   google.protobuf.Timestamp stopped_at = 3;
   TestStatus status = 4;
+  string log = 5;
+  string stdout = 6;
+  string stderr = 7;
 }
 
 service TestService{
