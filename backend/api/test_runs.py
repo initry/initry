@@ -2,9 +2,10 @@ import aiofiles
 import xmltodict
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from starlette import status
-from tasks import xml_related
+
 from schemas.test_run import TestRun, TestRunsList
 from services.test_runs import TestRunsService
+from tasks import xml_related
 
 test_run_router = APIRouter(prefix="/api/test-runs")
 test_run_service = TestRunsService()

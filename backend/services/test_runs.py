@@ -1,11 +1,12 @@
 import datetime
-from tasks import xml_related
+
 import pymongo
 from pymongo.collection import Collection
 
 from services.main import AppService
 from services.tests import TestsService
 from storage import st
+from tasks import xml_related
 from ws.ws import wsm
 
 PYTEST_EMPTY_SYSTEM_OUT = "--------------------------------- Captured Log ---------------------------------\n\n--------------------------------- Captured Out ---------------------------------"
@@ -129,7 +130,8 @@ class TestRunsService(AppService):
 
     def xml_get_raw_test_run(self, test_run_uuid):
         return self.mongo.count_documents_in_collection(
-            {"uuid": test_run_uuid}, "test_runs_raw")
+            {"uuid": test_run_uuid}, "test_runs_raw"
+        )
 
     def xml_create_tests(self, json_data, test_run_uuid):
         try:

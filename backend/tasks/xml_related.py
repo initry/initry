@@ -1,6 +1,5 @@
-from tasks.tasks import celery
 from database.mongo import MongoDB
-
+from tasks.tasks import celery
 
 
 @celery.task
@@ -25,13 +24,9 @@ def save_json_and_xml_files(json_data, xml_data, test_run_uuid):
 
 @celery.task
 def save_failed_logs(failures_for_db):
-    MongoDB().save_objects(
-        items=failures_for_db, collection_name="test_logs"
-    )
+    MongoDB().save_objects(items=failures_for_db, collection_name="test_logs")
 
 
 @celery.task
 def save_skipped_logs(skipped_for_db):
-    MongoDB().save_objects(
-        items=skipped_for_db, collection_name="test_logs"
-    )
+    MongoDB().save_objects(items=skipped_for_db, collection_name="test_logs")
