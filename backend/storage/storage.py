@@ -46,9 +46,10 @@ class InMemoryStorage:
                         test_run[key] = value
 
     def remove_test_run(self, test_run_uuid: str):
-        self.test_runs = [
-            item for item in self.test_runs if item["uuid"] != test_run_uuid
-        ]
+        with self.lock:
+            self.test_runs = [
+                item for item in self.test_runs if item["uuid"] != test_run_uuid
+            ]
 
     # Test
 
@@ -66,6 +67,12 @@ class InMemoryStorage:
                 return item
         return None
 
+    def get_test_by_test_run_uuid(self, test_run_uuid: str) -> Test | None:
+        for item in self.tests:
+            if item["testRunUuid"] == test_run_uuid:
+                return item
+        return None
+
     def modify_test(self, modified_test: Test):
         with self.lock:
             test_dict = {test["uuid"]: test for test in self.tests}
@@ -78,10 +85,13 @@ class InMemoryStorage:
     # Tests
 
     def create_tests(self, tests: TestsList):
-        test_list = []
-        for item in tests:
-            test_list.append(item)
-        self.tests.extend(test_list)
+        with self.lock:
+            for item in tests:
+                if not any(
+                    existing_test["nodeid"] == item["nodeid"]
+                    for existing_test in self.tests
+                ):
+                    self.tests.append(item)
 
     def remove_tests(self, test_run_uuid: str):
         with self.lock:
@@ -123,14 +133,18 @@ class InMemoryStorage:
 
     def save_test_run_and_test_data(
         self, test_run_uuid: str, stopped_at: str
-    ) -> dict[str, int]:
+    ) -> dict[str, int] | bool:
         test_statuses = {"passed": 0, "failed": 0, "skipped": 0}
         # Filter relevant tests for the test_run UUID
         relevant_tests = [
             test for test in self.tests if test["testRunUuid"] == test_run_uuid
         ]
         for item in relevant_tests:
+            if "status" not in item:
+                return False
             status = item["status"].lower()
+            if (status == "running") or ("stoppedAt" not in item):
+                return False
             test_statuses[status] += 1
         self.modify_test_run(
             test_run_uuid,
