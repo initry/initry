@@ -1,5 +1,5 @@
 import datetime
-
+from tasks import xml_related
 import pymongo
 from pymongo.collection import Collection
 
@@ -113,11 +113,9 @@ class TestRunsService(AppService):
                 "hostName": testsuite["@hostname"],
                 # data["testsuites"]["testsuite"]["@errors"]
             }
-            self.mongo.modify_object(
-                find={"uuid": test_run_uuid},
-                update={**test_run},
-                collection_name="test_runs",
-            )
+
+            xml_related.create_db_data_based_on_xml.delay(test_run_uuid, test_run)
+
         except Exception as e:
             print(e)
 
@@ -131,8 +129,7 @@ class TestRunsService(AppService):
 
     def xml_get_raw_test_run(self, test_run_uuid):
         return self.mongo.count_documents_in_collection(
-            {"uuid": test_run_uuid}, "test_runs_raw"
-        )
+            {"uuid": test_run_uuid}, "test_runs_raw")
 
     def xml_create_tests(self, json_data, test_run_uuid):
         try:
@@ -181,21 +178,8 @@ class TestRunsService(AppService):
 
             self.mongo.save_objects(items=tests_for_db, collection_name="tests")
             if failures_for_db:
-                self.mongo.save_objects(
-                    items=failures_for_db, collection_name="test_logs"
-                )
+                xml_related.save_failed_logs.delay(failures_for_db)
             if skipped_for_db:
-                self.mongo.save_objects(
-                    items=skipped_for_db, collection_name="test_logs"
-                )
-        except Exception as e:
-            print(e)
-
-    def raw_data_save(self, json_data, xml_data, test_run_uuid):
-        try:
-            self.mongo.insert_object(
-                item={"uuid": test_run_uuid, "json": json_data, "xml": xml_data},
-                collection_name="test_runs_raw",
-            )
+                xml_related.save_skipped_logs.delay(skipped_for_db)
         except Exception as e:
             print(e)

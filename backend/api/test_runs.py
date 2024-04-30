@@ -2,7 +2,7 @@ import aiofiles
 import xmltodict
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 from starlette import status
-
+from tasks import xml_related
 from schemas.test_run import TestRun, TestRunsList
 from services.test_runs import TestRunsService
 
@@ -53,9 +53,9 @@ async def upload_xml(
                 count = test_run_service.xml_get_raw_test_run(uuid)
                 if count > 0:
                     return
-                test_run_service.xml_modify_test_run(json_data, uuid)  # move to celery
-                test_run_service.xml_create_tests(json_data, uuid)  # move to celery
-                test_run_service.raw_data_save(
+                test_run_service.xml_modify_test_run(json_data, uuid)
+                test_run_service.xml_create_tests(json_data, uuid)
+                xml_related.save_json_and_xml_files.delay(
                     json_data=json_data, xml_data=reader, test_run_uuid=uuid
                 )  # move to celery
             if mode == "store":
@@ -69,9 +69,9 @@ async def upload_xml(
                 if testsuite["@hostname"]:
                     test_run["hostName"] = testsuite["@hostname"]
                 test_run_service.modify_test_run(test_run, uuid)
-                test_run_service.raw_data_save(
+                xml_related.save_json_and_xml_files.delay(
                     json_data=json_data, xml_data=reader, test_run_uuid=uuid
-                )  # move to celery
+                )
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
