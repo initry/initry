@@ -7,5 +7,5 @@ celery = Celery(
     __name__,
     broker=settings.get("BROKER_URL"),
     backend=settings.get("CELERY_RESULT_BACKEND"),
-    include=["tasks.test_run_finalization", "tasks.test_logs"],
+    include=["tasks.test_run_finalization", "tasks.test_logs", "tasks.xml_related"],
 )
